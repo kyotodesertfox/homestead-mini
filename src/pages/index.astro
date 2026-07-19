@@ -149,11 +149,25 @@ const procurementHasOpen = procurementTasks.some(t => t.status === 'open');
               <p class="text-sm text-[#7A6652]">Raw, local, seasonal.</p>
             </div>
           </li>
-          <li class="flex items-start gap-4 bg-white rounded-xl px-5 py-4 shadow-sm">
-            <span class="text-2xl">🍺</span>
-            <div>
-              <p class="font-semibold">Beer</p>
-              <p class="text-sm text-[#7A6652]">Small batch, home brewed.</p>
+          <li class="bg-white rounded-xl shadow-sm">
+            <button class="have-toggle w-full flex items-center gap-4 px-5 py-4 text-left">
+              <span class="text-2xl">🍺</span>
+              <div class="flex-1">
+                <p class="font-semibold">Beer</p>
+                <p class="text-sm text-[#7A6652]">Small batch, home brewed.</p>
+              </div>
+              <svg class="have-chevron w-4 h-4 text-[#7A6652] transition-transform duration-200 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div class="have-body hidden border-t border-[#F0E8DF] px-5 py-5">
+              <div class="bg-[#D4A017]/10 border border-[#D4A017]/30 rounded-xl px-5 py-5 text-center mx-auto max-w-xs">
+                <p class="text-[10px] font-semibold uppercase tracking-widest text-[#D4A017] mb-1">Currently on tap</p>
+                <p class="text-[#7A6652] text-[11px] mb-4">Available in Bottles / Draft</p>
+                <p class="text-[#2C2C2C] font-bold text-lg leading-snug mb-1">Caribou Slobber</p>
+                <p class="text-[#7A6652] text-xs mb-4">Recipe by Northern Brewers</p>
+                <a href="https://cdn.shopify.com/s/files/1/2785/6868/t/3/assets/CaribouSlobber-1526673747421.pdf?528002487593717657" target="_blank" rel="noopener" class="inline-block text-xs font-semibold text-[#D4A017] border border-[#D4A017]/40 rounded-full px-4 py-1.5 hover:bg-[#D4A017]/20 transition">View recipe</a>
+              </div>
             </div>
           </li>
         </ul>
@@ -302,39 +316,54 @@ const procurementHasOpen = procurementTasks.some(t => t.status === 'open');
                 </div>
               )}
               {procurementTasks.map(t => (
-                <div class="task-row flex items-start justify-between gap-4 px-5 py-3 border-t border-[#F0E8DF]">
-                  <div class="flex flex-col gap-2 min-w-0">
-                    <p class="text-sm text-[#2C2C2C]">{t.task}</p>
-                    {t.url && (
-                      <div class="link-preview-slot" data-url={t.url}>
-                        <div class="link-preview-loading flex items-center gap-2 text-xs text-[#7A6652]">
-                          <span class="w-4 h-4 rounded bg-[#E8DDD0] animate-pulse inline-block"></span>
-                          <span class="animate-pulse">Loading preview...</span>
+                <div class="task-row flex flex-col gap-2.5 px-5 py-3 border-t border-[#F0E8DF]">
+                  <div class="flex items-start justify-between gap-4">
+                    <p class="text-sm text-[#2C2C2C] min-w-0">{t.task}</p>
+                    <div class="flex flex-col items-end gap-1.5 shrink-0">
+                    <div class="flex items-center gap-2">
+                      {t.eggs > 24 ? (
+                        <div class="relative">
+                          <span class="egg-warn-trigger flex items-center gap-1.5 text-xs font-semibold text-[#3B5E3A] bg-[#3B5E3A]/10 px-2 py-1 rounded-full cursor-pointer select-none">
+                            {t.eggs} eggs
+                            <span class="w-4 h-4 rounded-full bg-[#D4A017] text-[#1a1a1a] text-[9px] font-bold flex items-center justify-center leading-none shrink-0">!</span>
+                          </span>
+                          <div class="egg-warn-tooltip hidden absolute right-0 top-8 z-50 w-60 bg-[#2C2C2C] text-white rounded-xl px-3.5 py-3 shadow-xl text-left">
+                            <p class="text-xs font-semibold text-[#D4A017] mb-1">That's a lot of eggs.</p>
+                            <p class="text-xs text-[#ccc] leading-relaxed">Most people don't need that many at once - but your claim doesn't expire. You can collect in batches or pass it on.</p>
+                          </div>
                         </div>
-                      </div>
-                    )}
-                  </div>
-                  <div class="flex items-center gap-2 shrink-0">
-                    <span class="text-xs font-semibold text-[#3B5E3A] bg-[#3B5E3A]/10 px-2 py-1 rounded-full">{t.eggs} eggs</span>
+                      ) : (
+                        <span class="text-xs font-semibold text-[#3B5E3A] bg-[#3B5E3A]/10 px-2 py-1 rounded-full">{t.eggs} eggs</span>
+                      )}
+                      {t.status === 'open' && (
+                        <button class="task-claim-btn text-xs font-semibold text-[#D4A017] border border-[#D4A017] rounded-full px-3 py-1 hover:bg-[#D4A017] hover:text-white transition" data-task={t.task} data-eggs={String(t.eggs)}>Claim</button>
+                      )}
+                      {t.status === 'pending' && (
+                        <span class="text-xs font-semibold text-[#D4A017] bg-[#D4A017]/10 px-3 py-1 rounded-full">Pending</span>
+                      )}
+                      {t.status === 'claimed' && (
+                        <span class="text-xs font-semibold text-[#7A6652] bg-[#7A6652]/10 px-3 py-1 rounded-full">Claimed</span>
+                      )}
+                    </div>
                     {t.eggs > 24 && (
-                      <div class="relative">
-                        <button class="egg-info-btn w-5 h-5 rounded-full bg-[#D4A017] text-[#1a1a1a] text-[11px] font-bold flex items-center justify-center leading-none ring-2 ring-[#D4A017]/30" aria-label="What is $EGG?">!</button>
+                      <div class="relative w-full">
+                        <button class="egg-info-btn w-full text-[10px] font-semibold text-[#D4A017] border border-[#D4A017]/40 bg-[#D4A017]/5 rounded-full px-3 py-1 hover:bg-[#D4A017]/15 transition">What is $EGG?</button>
                         <div class="egg-tooltip hidden absolute right-0 top-7 z-50 w-60 bg-[#2C2C2C] text-white rounded-xl px-3.5 py-3 shadow-xl text-left">
-                          <p class="text-xs font-semibold text-[#D4A017] mb-1">That's a lot of eggs.</p>
-                          <p class="text-xs text-[#ccc] leading-relaxed">Most people don't need that many at once. <span class="text-white font-medium">$EGG</span> lets you bank the rest - a redeemable claim tracked on a ledger neither of us controls. Collect when you're ready, hold as long as you want, or pass it to someone else.</p>
+                          <p class="text-xs font-semibold text-[#D4A017] mb-1">What is $EGG?</p>
+                          <p class="text-xs text-[#ccc] leading-relaxed"><span class="text-white font-medium">$EGG</span> is a redeemable claim tracked on a ledger neither of us controls. Collect when you're ready, hold as long as you want, or pass it to someone else.</p>
                         </div>
                       </div>
                     )}
-                    {t.status === 'open' && (
-                      <button class="task-claim-btn text-xs font-semibold text-[#D4A017] border border-[#D4A017] rounded-full px-3 py-1 hover:bg-[#D4A017] hover:text-white transition" data-task={t.task} data-eggs={String(t.eggs)}>Claim</button>
-                    )}
-                    {t.status === 'pending' && (
-                      <span class="text-xs font-semibold text-[#D4A017] bg-[#D4A017]/10 px-3 py-1 rounded-full">Pending</span>
-                    )}
-                    {t.status === 'claimed' && (
-                      <span class="text-xs font-semibold text-[#7A6652] bg-[#7A6652]/10 px-3 py-1 rounded-full">Claimed</span>
-                    )}
+                    </div>
                   </div>
+                  {t.url && (
+                    <div class="link-preview-slot" data-url={t.url}>
+                      <div class="link-preview-loading flex items-center gap-2 text-xs text-[#7A6652]">
+                        <span class="w-4 h-4 rounded bg-[#E8DDD0] animate-pulse inline-block"></span>
+                        <span class="animate-pulse">Loading preview...</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
 
@@ -431,7 +460,7 @@ const procurementHasOpen = procurementTasks.some(t => t.status === 'open');
         return `
           <a href="${escaped(url)}" target="_blank" rel="noopener noreferrer"
              class="block border border-[#E8DDD0] rounded-xl overflow-hidden hover:border-[#D4A017] transition bg-white no-underline">
-            ${data.image ? `<img src="${escaped(data.image)}" alt="" class="w-full object-cover max-h-36" onerror="this.remove()" />` : ''}
+            ${data.image ? `<img src="${escaped(data.image)}" alt="" class="w-full object-cover max-h-48" onerror="this.remove()" />` : ''}
             <div class="px-3 py-2.5 space-y-1">
               <div class="flex items-center gap-1.5">
                 <img src="${favicon}" class="w-4 h-4 shrink-0" alt="" onerror="this.remove()" />
@@ -467,19 +496,41 @@ const procurementHasOpen = procurementTasks.some(t => t.status === 'open');
         });
       }
 
-      // --- $EGG tooltip ---
-      document.querySelectorAll('.egg-info-btn').forEach(btn => {
-        const tooltip = btn.nextElementSibling;
-        btn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          const isOpen = !tooltip?.classList.contains('hidden');
-          document.querySelectorAll('.egg-tooltip').forEach(t => t.classList.add('hidden'));
-          if (!isOpen) tooltip?.classList.remove('hidden');
+      // --- $EGG tooltips ---
+      function wireTooltip(triggerSel, tooltipClass) {
+        document.querySelectorAll(triggerSel).forEach(trigger => {
+          const tooltip = trigger.closest('.relative')?.querySelector(`.${tooltipClass}`);
+          trigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = !tooltip?.classList.contains('hidden');
+            document.querySelectorAll('.egg-tooltip, .egg-warn-tooltip').forEach(t => t.classList.add('hidden'));
+            if (!isOpen) tooltip?.classList.remove('hidden');
+          });
         });
-      });
+      }
+      wireTooltip('.egg-info-btn', 'egg-tooltip');
+      wireTooltip('.egg-warn-trigger', 'egg-warn-tooltip');
       document.addEventListener('click', () => {
-        document.querySelectorAll('.egg-tooltip').forEach(t => t.classList.add('hidden'));
+        document.querySelectorAll('.egg-tooltip, .egg-warn-tooltip').forEach(t => t.classList.add('hidden'));
       });
+
+      // Desktop hover
+      if (window.matchMedia('(hover: hover)').matches) {
+        [
+          { trigger: '.egg-warn-trigger', tooltipClass: 'egg-warn-tooltip' },
+          { trigger: '.egg-info-btn',     tooltipClass: 'egg-tooltip' },
+        ].forEach(({ trigger, tooltipClass }) => {
+          document.querySelectorAll(trigger).forEach(el => {
+            const wrapper = el.closest('.relative');
+            const tooltip = wrapper?.querySelector(`.${tooltipClass}`);
+            wrapper?.addEventListener('mouseenter', () => {
+              document.querySelectorAll('.egg-tooltip, .egg-warn-tooltip').forEach(t => t.classList.add('hidden'));
+              tooltip?.classList.remove('hidden');
+            });
+            wrapper?.addEventListener('mouseleave', () => tooltip?.classList.add('hidden'));
+          });
+        });
+      }
 
       // --- Mobile nav toggle ---
       const toggle = document.getElementById('menu-toggle');
@@ -556,6 +607,16 @@ const procurementHasOpen = procurementTasks.some(t => t.status === 'open');
       });
 
       // --- Accordion task cards ---
+      document.querySelectorAll('.have-toggle').forEach(btn => {
+        const body = btn.nextElementSibling;
+        const chevron = btn.querySelector('.have-chevron');
+        btn.addEventListener('click', () => {
+          const isOpen = !body?.classList.contains('hidden');
+          body?.classList.toggle('hidden', isOpen);
+          chevron?.classList.toggle('rotate-180', !isOpen);
+        });
+      });
+
       document.querySelectorAll('.task-toggle').forEach(toggleBtn => {
         const card = toggleBtn.closest('li');
         const taskList = card?.querySelector('.task-list');
