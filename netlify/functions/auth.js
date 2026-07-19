@@ -1,4 +1,4 @@
-const https = require('https');
+import https from 'https';
 
 function postJson(url, payload) {
   return new Promise((resolve, reject) => {
@@ -24,7 +24,7 @@ function postJson(url, payload) {
   });
 }
 
-exports.handler = async (event) => {
+export const handler = async (event) => {
   const code = event.queryStringParameters?.code;
 
   if (!code) {
