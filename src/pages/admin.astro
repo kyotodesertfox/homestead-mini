@@ -60,12 +60,37 @@ const githubClientId = import.meta.env.GITHUB_CLIENT_ID ?? '';
         border: 1px solid #444;
       }
 
+      /* Tabs */
+      .tab-bar {
+        display: flex;
+        gap: 0.25rem;
+        background: #242424;
+        border: 1px solid #333;
+        border-radius: 999px;
+        padding: 0.25rem;
+        margin-bottom: 1.5rem;
+        width: fit-content;
+      }
+      .tab-btn {
+        padding: 0.35rem 1rem;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        background: transparent;
+        color: #888;
+        transition: all 0.15s;
+      }
+      .tab-btn.active { background: #D4A017; color: #1a1a1a; }
+      .tab-btn:not(.active):hover { color: #e5e5e5; }
+
       /* Toolbar */
       .toolbar {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 1.5rem;
+        margin-bottom: 1rem;
         gap: 1rem;
         flex-wrap: wrap;
       }
@@ -83,7 +108,7 @@ const githubClientId = import.meta.env.GITHUB_CLIENT_ID ?? '';
       #status-msg.ok { background: #1e3a1e; color: #6fcf6f; display: inline-block; }
       #status-msg.err { background: #3a1e1e; color: #e57373; display: inline-block; }
 
-      /* Task cards */
+      /* Cards */
       #task-list { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem; }
 
       .task-card {
@@ -164,7 +189,7 @@ const githubClientId = import.meta.env.GITHUB_CLIENT_ID ?? '';
       <div class="toolbar">
         <div>
           <h1>Homestead Admin</h1>
-          <p class="subtitle">Edit tasks below - changes go live after Netlify redeploys (~30s)</p>
+          <p class="subtitle">Changes go live after Netlify redeploys (~30s)</p>
         </div>
         <div class="toolbar-right">
           <span id="status-msg"></span>
@@ -173,22 +198,33 @@ const githubClientId = import.meta.env.GITHUB_CLIENT_ID ?? '';
         </div>
       </div>
 
+      <div class="tab-bar">
+        <button class="tab-btn active" data-tab="tasks">Homestead Tasks</button>
+        <button class="tab-btn" data-tab="procurement">Procurement</button>
+      </div>
+
       <div id="task-list"></div>
 
       <div class="add-task-row">
-        <button class="btn btn-outline" id="add-task-btn">+ Add task</button>
+        <button class="btn btn-outline" id="add-task-btn">+ Add item</button>
       </div>
     </div>
 
     <script>
       const REPO = 'kyotodesertfox/homestead-mini';
-      const FILE_PATH = 'src/data/tasks.json';
+      const FILES = {
+        tasks: 'src/data/tasks.json',
+        procurement: 'src/data/procurement.json',
+      };
       const API = 'https://api.github.com';
       const CLIENT_ID = (document.body as HTMLBodyElement).dataset.clientId ?? '';
 
       let token = localStorage.getItem('github_token');
-      let currentSha = null;
-      let tasks = [];
+      let activeTab = 'tasks';
+      const state = {
+        tasks:       { sha: null, items: [], loaded: false },
+        procurement: { sha: null, items: [], loaded: false },
+      };
 
       // --- Screens ---
       function show(id) {
@@ -204,7 +240,7 @@ const githubClientId = import.meta.env.GITHUB_CLIENT_ID ?? '';
         if (!isErr) setTimeout(() => { el.className = ''; el.textContent = ''; }, 4000);
       }
 
-      // --- GitHub login link ---
+      // --- GitHub login ---
       const loginBtn = document.getElementById('github-login-btn');
       if (loginBtn && CLIENT_ID) {
         loginBtn.setAttribute('href', `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&scope=repo&allow_signup=false`);
@@ -228,7 +264,6 @@ const githubClientId = import.meta.env.GITHUB_CLIENT_ID ?? '';
         }
       }
 
-      // --- Auth ---
       document.getElementById('logout-btn')?.addEventListener('click', () => {
         localStorage.removeItem('github_token');
         token = null;
@@ -245,7 +280,7 @@ const githubClientId = import.meta.env.GITHUB_CLIENT_ID ?? '';
       }
 
       async function ghPut(path, body) {
-        const res = await fetch(`${API}${path}`, {
+        return fetch(`${API}${path}`, {
           method: 'PUT',
           headers: {
             Authorization: `Bearer ${token}`,
@@ -254,23 +289,28 @@ const githubClientId = import.meta.env.GITHUB_CLIENT_ID ?? '';
           },
           body: JSON.stringify(body),
         });
-        return res;
       }
 
-      // --- Load ---
-      async function init() {
+      // --- Load tab ---
+      async function loadTab(tab) {
+        if (state[tab].loaded) { renderItems(); return; }
         show('loading');
-        const data = await ghGet(`/repos/${REPO}/contents/${FILE_PATH}`);
+        const data = await ghGet(`/repos/${REPO}/contents/${FILES[tab]}`);
         if (!data) {
           localStorage.removeItem('github_token');
           token = null;
           show('login-screen');
           return;
         }
-        currentSha = data.sha;
-        tasks = JSON.parse(atob(data.content.replace(/\n/g, '')));
-        renderTasks();
+        state[tab].sha = data.sha;
+        state[tab].items = JSON.parse(atob(data.content.replace(/\n/g, '')));
+        state[tab].loaded = true;
+        renderItems();
         show('admin-screen');
+      }
+
+      async function init() {
+        await loadTab(activeTab);
       }
 
       // --- Render ---
@@ -279,23 +319,19 @@ const githubClientId = import.meta.env.GITHUB_CLIENT_ID ?? '';
       }
 
       function taskCard(t, i) {
-        const statuses = ['open', 'pending', 'claimed'];
-        const opts = statuses.map(s =>
+        const opts = ['open','pending','claimed'].map(s =>
           `<option value="${s}" ${t.status === s ? 'selected' : ''}>${s}</option>`
         ).join('');
-
         return `
           <div class="task-card" data-index="${i}">
             <div class="card-header">
               <span class="task-num">Task ${i + 1}</span>
               <button class="btn btn-danger delete-btn" data-index="${i}">Remove</button>
             </div>
-
             <div class="field-group">
-              <label>Task description</label>
+              <label>Description</label>
               <input type="text" name="task" value="${esc(t.task)}" placeholder="Describe the task" />
             </div>
-
             <div class="field-row">
               <div class="field-group">
                 <label>Eggs</label>
@@ -306,44 +342,93 @@ const githubClientId = import.meta.env.GITHUB_CLIENT_ID ?? '';
                 <select name="status">${opts}</select>
               </div>
             </div>
-
             <div class="field-group">
               <label>Claimed by</label>
               <input type="text" name="claimedBy" value="${esc(t.claimedBy ?? '')}" placeholder="Leave blank if open" />
             </div>
-
             <label class="check-label">
               <input type="checkbox" name="anonymous" ${t.anonymous ? 'checked' : ''} />
               Keep name private (show as Anonymous)
             </label>
-
             <div class="field-group">
               <label>Image URL</label>
               <input type="text" name="image" value="${esc(t.image ?? '')}" placeholder="/photo.jpg or https://..." />
             </div>
-
             <input type="hidden" name="id" value="${esc(t.id)}" />
-            <input type="hidden" name="category" value="${esc(t.category)}" />
-          </div>
-        `;
+            <input type="hidden" name="category" value="${esc(t.category ?? 'garden')}" />
+          </div>`;
       }
 
-      function renderTasks() {
+      function procurementCard(t, i) {
+        const opts = ['open','pending','claimed'].map(s =>
+          `<option value="${s}" ${t.status === s ? 'selected' : ''}>${s}</option>`
+        ).join('');
+        return `
+          <div class="task-card" data-index="${i}">
+            <div class="card-header">
+              <span class="task-num">Item ${i + 1}</span>
+              <button class="btn btn-danger delete-btn" data-index="${i}">Remove</button>
+            </div>
+            <div class="field-group">
+              <label>Description</label>
+              <input type="text" name="task" value="${esc(t.task)}" placeholder="What are you looking to source?" />
+            </div>
+            <div class="field-group">
+              <label>Reference URL</label>
+              <input type="text" name="url" value="${esc(t.url ?? '')}" placeholder="https://..." />
+            </div>
+            <div class="field-row">
+              <div class="field-group">
+                <label>Eggs</label>
+                <input type="number" name="eggs" value="${t.eggs ?? 0}" min="0" />
+              </div>
+              <div class="field-group">
+                <label>Status</label>
+                <select name="status">${opts}</select>
+              </div>
+            </div>
+            <div class="field-group">
+              <label>Claimed by</label>
+              <input type="text" name="claimedBy" value="${esc(t.claimedBy ?? '')}" placeholder="Leave blank if open" />
+            </div>
+            <label class="check-label">
+              <input type="checkbox" name="anonymous" ${t.anonymous ? 'checked' : ''} />
+              Keep name private (show as Anonymous)
+            </label>
+            <input type="hidden" name="id" value="${esc(t.id)}" />
+          </div>`;
+      }
+
+      function renderItems() {
         const list = document.getElementById('task-list');
-        list.innerHTML = tasks.map((t, i) => taskCard(t, i)).join('');
+        const items = state[activeTab].items;
+        const cardFn = activeTab === 'procurement' ? procurementCard : taskCard;
+        list.innerHTML = items.map((t, i) => cardFn(t, i)).join('');
         list.querySelectorAll('.delete-btn').forEach(btn => {
           btn.addEventListener('click', () => {
-            tasks.splice(parseInt((btn as HTMLElement).dataset.index), 1);
-            renderTasks();
+            state[activeTab].items.splice(parseInt((btn as HTMLElement).dataset.index), 1);
+            renderItems();
           });
         });
       }
 
       // --- Collect ---
-      function collectTasks() {
+      function collectItems() {
         return Array.from(document.querySelectorAll('.task-card')).map(card => {
           const g = (name) => (card.querySelector(`[name="${name}"]`) as HTMLInputElement);
           const claimedBy = g('claimedBy').value.trim();
+          if (activeTab === 'procurement') {
+            const url = g('url').value.trim();
+            return {
+              id: g('id').value || `item-${Date.now()}`,
+              task: g('task').value.trim(),
+              url: url || null,
+              eggs: parseInt(g('eggs').value) || 0,
+              status: g('status').value,
+              claimedBy: claimedBy || null,
+              anonymous: (g('anonymous') as HTMLInputElement).checked,
+            };
+          }
           const image = g('image').value.trim();
           return {
             id: g('id').value || `task-${Date.now()}`,
@@ -358,47 +443,53 @@ const githubClientId = import.meta.env.GITHUB_CLIENT_ID ?? '';
         });
       }
 
+      // --- Tabs ---
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const tab = (btn as HTMLElement).dataset.tab;
+          if (tab === activeTab) return;
+          activeTab = tab;
+          document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b === btn));
+          await loadTab(tab);
+        });
+      });
+
       // --- Save ---
       document.getElementById('save-btn')?.addEventListener('click', async () => {
-        const saveBtn = document.getElementById('save-btn');
+        const saveBtn = document.getElementById('save-btn') as HTMLButtonElement;
         saveBtn.textContent = 'Saving...';
-        (saveBtn as HTMLButtonElement).disabled = true;
+        saveBtn.disabled = true;
 
-        const updated = collectTasks();
+        const updated = collectItems();
         const newJson = JSON.stringify(updated, null, 2);
+        const label = activeTab === 'procurement' ? 'procurement' : 'tasks';
 
-        const res = await ghPut(`/repos/${REPO}/contents/${FILE_PATH}`, {
-          message: 'Update tasks via admin panel',
+        const res = await ghPut(`/repos/${REPO}/contents/${FILES[activeTab]}`, {
+          message: `Update ${label} via admin panel`,
           content: btoa(unescape(encodeURIComponent(newJson))),
-          sha: currentSha,
+          sha: state[activeTab].sha,
         });
 
         if (res.ok) {
           const data = await res.json();
-          currentSha = data.content.sha;
-          tasks = updated;
+          state[activeTab].sha = data.content.sha;
+          state[activeTab].items = updated;
           setStatus('Saved. Site will update in ~30 seconds.');
         } else {
           setStatus('Save failed - token may have expired.', true);
         }
 
         saveBtn.textContent = 'Save to site';
-        (saveBtn as HTMLButtonElement).disabled = false;
+        saveBtn.disabled = false;
       });
 
-      // --- Add task ---
+      // --- Add item ---
       document.getElementById('add-task-btn')?.addEventListener('click', () => {
-        tasks.push({
-          id: `task-${Date.now()}`,
-          category: 'garden',
-          task: '',
-          eggs: 0,
-          status: 'open',
-          claimedBy: null,
-          anonymous: false,
-          image: null,
-        });
-        renderTasks();
+        const blank = activeTab === 'procurement'
+          ? { id: `item-${Date.now()}`, task: '', url: null, eggs: 0, status: 'open', claimedBy: null, anonymous: false }
+          : { id: `task-${Date.now()}`, category: 'garden', task: '', eggs: 0, status: 'open', claimedBy: null, anonymous: false, image: null };
+        state[activeTab].items.push(blank);
+        renderItems();
         document.querySelector('.task-card:last-child')?.scrollIntoView({ behavior: 'smooth' });
       });
 
