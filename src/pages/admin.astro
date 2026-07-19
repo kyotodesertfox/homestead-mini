@@ -258,9 +258,14 @@ const githubClientId = import.meta.env.GITHUB_CLIENT_ID ?? '';
             await init();
           } else {
             show('login-screen');
+            const errMsg = data.error_description || data.error || 'Auth failed - try again.';
+            const box = document.querySelector('.login-box p');
+            if (box) box.textContent = errMsg;
           }
-        } catch {
+        } catch (e) {
           show('login-screen');
+          const box = document.querySelector('.login-box p');
+          if (box) box.textContent = `Auth error: ${e.message}`;
         }
       }
 
