@@ -129,39 +129,51 @@ const githubClientId = import.meta.env.GITHUB_CLIENT_ID ?? '';
       }
 
       /* Cards */
-      #task-list { display: flex; flex-direction: column; gap: 0.85rem; margin-bottom: 1.5rem; }
+      #task-list { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem; }
 
       .task-card {
-        background: #1e1e1e;
-        border: 1px solid #2a2a2a;
-        border-left: 3px solid #D4A017;
-        border-radius: 12px;
-        padding: 1.25rem;
-        display: flex;
-        flex-direction: column;
-        gap: 0.9rem;
+        background: #242424;
+        border: 1px solid #363636;
+        border-radius: 14px;
+        overflow: hidden;
       }
 
       .card-header {
         display: flex;
         align-items: center;
         justify-content: space-between;
+        padding: 0.75rem 1.1rem;
+        background: #1e1e1e;
+        border-bottom: 1px solid #303030;
       }
       .task-num {
-        font-size: 0.7rem;
+        font-size: 0.72rem;
         font-weight: 700;
         color: #D4A017;
         text-transform: uppercase;
         letter-spacing: 0.08em;
       }
 
-      .field-group { display: flex; flex-direction: column; gap: 0.3rem; }
+      .card-body {
+        padding: 1.1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.85rem;
+      }
+
+      .card-divider {
+        height: 1px;
+        background: #303030;
+        margin: 0.1rem 0;
+      }
+
+      .field-group { display: flex; flex-direction: column; gap: 0.35rem; }
       .field-group label {
-        font-size: 0.68rem;
-        color: #555;
-        font-weight: 700;
+        font-size: 0.7rem;
+        color: #888;
+        font-weight: 600;
         text-transform: uppercase;
-        letter-spacing: 0.06em;
+        letter-spacing: 0.07em;
       }
 
       .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
@@ -170,29 +182,31 @@ const githubClientId = import.meta.env.GITHUB_CLIENT_ID ?? '';
       input[type="number"],
       select,
       textarea {
-        background: #141414;
-        border: 1px solid #2a2a2a;
+        background: #1a1a1a;
+        border: 1px solid #363636;
         border-radius: 8px;
         padding: 0.5rem 0.75rem;
-        color: #e5e5e5;
+        color: #e0e0e0;
         font-size: 0.875rem;
         width: 100%;
         font-family: inherit;
         transition: border-color 0.15s;
       }
-      input:focus, select:focus, textarea:focus { outline: none; border-color: #D4A017; }
+      input:focus, select:focus, textarea:focus { outline: none; border-color: #D4A017; background: #1e1e1e; }
       select { cursor: pointer; }
+      input::placeholder { color: #484848; }
 
       .check-label {
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        font-size: 0.83rem;
-        color: #666;
+        font-size: 0.82rem;
+        color: #777;
         cursor: pointer;
+        padding: 0.1rem 0;
       }
-      .check-label:hover { color: #aaa; }
-      input[type="checkbox"] { accent-color: #D4A017; width: 14px; height: 14px; cursor: pointer; }
+      .check-label:hover { color: #bbb; }
+      input[type="checkbox"] { accent-color: #D4A017; width: 14px; height: 14px; cursor: pointer; flex-shrink: 0; }
 
       /* Empty state */
       .empty-state {
@@ -200,13 +214,14 @@ const githubClientId = import.meta.env.GITHUB_CLIENT_ID ?? '';
         padding: 3rem 1rem;
         color: #444;
         font-size: 0.85rem;
+        border: 1px dashed #2a2a2a;
+        border-radius: 14px;
       }
 
       .add-task-row {
         text-align: center;
         padding: 0.75rem 0;
-        border-top: 1px solid #1e1e1e;
-        margin-top: 0.5rem;
+        margin-top: 0.25rem;
       }
     </style>
   </head>
@@ -386,34 +401,37 @@ const githubClientId = import.meta.env.GITHUB_CLIENT_ID ?? '';
               <span class="task-num">Task ${i + 1}</span>
               <button class="btn btn-danger delete-btn" data-index="${i}">Remove</button>
             </div>
-            <div class="field-group">
-              <label>Description</label>
-              <input type="text" name="task" value="${esc(t.task)}" placeholder="Describe the task" />
-            </div>
-            <div class="field-row">
+            <div class="card-body">
               <div class="field-group">
-                <label>Eggs</label>
-                <input type="number" name="eggs" value="${t.eggs ?? 0}" min="0" />
+                <label>Description</label>
+                <input type="text" name="task" value="${esc(t.task)}" placeholder="Describe the task" />
               </div>
               <div class="field-group">
-                <label>Status</label>
-                <select name="status">${opts}</select>
+                <label>Image URL</label>
+                <input type="text" name="image" value="${esc(t.image ?? '')}" placeholder="/photo.jpg or https://..." />
               </div>
+              <div class="card-divider"></div>
+              <div class="field-row">
+                <div class="field-group">
+                  <label>Eggs</label>
+                  <input type="number" name="eggs" value="${t.eggs ?? 0}" min="0" />
+                </div>
+                <div class="field-group">
+                  <label>Status</label>
+                  <select name="status">${opts}</select>
+                </div>
+              </div>
+              <div class="field-group">
+                <label>Claimed by</label>
+                <input type="text" name="claimedBy" value="${esc(t.claimedBy ?? '')}" placeholder="Leave blank if open" />
+              </div>
+              <label class="check-label">
+                <input type="checkbox" name="anonymous" ${t.anonymous ? 'checked' : ''} />
+                Keep name private (show as Anonymous)
+              </label>
+              <input type="hidden" name="id" value="${esc(t.id)}" />
+              <input type="hidden" name="category" value="${esc(t.category ?? 'garden')}" />
             </div>
-            <div class="field-group">
-              <label>Claimed by</label>
-              <input type="text" name="claimedBy" value="${esc(t.claimedBy ?? '')}" placeholder="Leave blank if open" />
-            </div>
-            <label class="check-label">
-              <input type="checkbox" name="anonymous" ${t.anonymous ? 'checked' : ''} />
-              Keep name private (show as Anonymous)
-            </label>
-            <div class="field-group">
-              <label>Image URL</label>
-              <input type="text" name="image" value="${esc(t.image ?? '')}" placeholder="/photo.jpg or https://..." />
-            </div>
-            <input type="hidden" name="id" value="${esc(t.id)}" />
-            <input type="hidden" name="category" value="${esc(t.category ?? 'garden')}" />
           </div>`;
       }
 
@@ -427,6 +445,7 @@ const githubClientId = import.meta.env.GITHUB_CLIENT_ID ?? '';
               <span class="task-num">Item ${i + 1}</span>
               <button class="btn btn-danger delete-btn" data-index="${i}">Remove</button>
             </div>
+            <div class="card-body">
             <div class="field-group">
               <label>Description</label>
               <input type="text" name="task" value="${esc(t.task)}" placeholder="What are you looking to source?" />
@@ -435,6 +454,7 @@ const githubClientId = import.meta.env.GITHUB_CLIENT_ID ?? '';
               <label>Reference URL</label>
               <input type="text" name="url" value="${esc(t.url ?? '')}" placeholder="https://..." />
             </div>
+            <div class="card-divider"></div>
             <div class="field-row">
               <div class="field-group">
                 <label>Eggs</label>
@@ -454,6 +474,7 @@ const githubClientId = import.meta.env.GITHUB_CLIENT_ID ?? '';
               Keep name private (show as Anonymous)
             </label>
             <input type="hidden" name="id" value="${esc(t.id)}" />
+            </div>
           </div>`;
       }
 
