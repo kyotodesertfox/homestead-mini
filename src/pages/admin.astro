@@ -783,6 +783,11 @@ const githubClientId = import.meta.env.GITHUB_CLIENT_ID ?? '';
         btn.disabled = false;
 
         if (res.ok || res.status === 204) {
+          // Clean up draft branch
+          await fetch(`${API}/repos/${REPO}/git/refs/heads/draft`, {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${token}` },
+          });
           currentBranch = null;
           stagedTabs.clear();
           Object.values(state).forEach(s => { s.loaded = false; s.sha = null; });
