@@ -1,1 +1,11 @@
-[]
+[
+  {
+    "id": "item-1784493038090",
+    "task": "Amazon : Hose Reel - or similar",
+    "url": "https://www.amazon.com/Giraffe-Retractable-Mounted-180%C2%B0Swivel-Bracket/dp/B097P2RVVQ",
+    "eggs": 100,
+    "status": "open",
+    "claimedBy": null,
+    "anonymous": false
+  }
+]
