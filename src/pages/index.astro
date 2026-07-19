@@ -420,12 +420,19 @@ const gardenHasOpen = gardenTasks.some(t => t.status === 'open');
           const eggs = btn.dataset.eggs ?? '';
 
           if (label) label.textContent = `Claiming: ${task} (${eggs} eggs)`;
-          if (nameField) (nameField as HTMLInputElement).value = `${task} (${eggs} eggs)`;
 
           panel?.classList.remove('hidden');
           successMsg?.classList.add('hidden');
           form?.classList.remove('hidden');
-          form?.reset();
+
+          // Clear visible fields only - never reset() which wipes hidden fields
+          form?.querySelectorAll('input[type="text"], textarea').forEach(el => {
+            (el as HTMLInputElement).value = '';
+          });
+          form?.querySelectorAll('input[type="checkbox"]').forEach(el => {
+            (el as HTMLInputElement).checked = false;
+          });
+
           if (nameField) (nameField as HTMLInputElement).value = `${task} (${eggs} eggs)`;
           panel?.querySelector('input[name="name"]')?.focus();
         });
@@ -452,10 +459,14 @@ const gardenHasOpen = gardenTasks.some(t => t.status === 'open');
           const submitBtn = form.querySelector('.submit-btn');
           if (submitBtn) submitBtn.textContent = 'Sending...';
           try {
+            const formData = new FormData(form as HTMLFormElement);
+            const anonBox = form.querySelector('input[name="anonymous"]') as HTMLInputElement | null;
+            formData.delete('anonymous');
+            formData.append('anonymous', anonBox?.checked ? 'Yes' : 'No');
             await fetch('/', {
               method: 'POST',
               headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-              body: new URLSearchParams(new FormData(form as HTMLFormElement)).toString(),
+              body: new URLSearchParams(formData).toString(),
             });
             form.classList.add('hidden');
             successMsg?.classList.remove('hidden');
