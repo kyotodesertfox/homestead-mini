@@ -17,13 +17,23 @@ exports.handler = async (event) => {
 
   const data = await res.json();
 
-  if (data.error) {
-    return { statusCode: 400, body: JSON.stringify(data) };
+  if (data.access_token) {
+    return {
+      statusCode: 200,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: data.access_token }),
+    };
   }
 
+  // Return full GitHub response so the client can show exactly what went wrong
   return {
-    statusCode: 200,
+    statusCode: 400,
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ token: data.access_token }),
+    body: JSON.stringify({
+      error: data.error || 'no_access_token',
+      error_description: data.error_description || JSON.stringify(data),
+      debug_has_client_id: !!process.env.GITHUB_CLIENT_ID,
+      debug_has_client_secret: !!process.env.GITHUB_CLIENT_SECRET,
+    }),
   };
 };

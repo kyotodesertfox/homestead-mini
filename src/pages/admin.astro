@@ -259,8 +259,9 @@ const githubClientId = import.meta.env.GITHUB_CLIENT_ID ?? '';
           } else {
             show('login-screen');
             const errMsg = data.error_description || data.error || 'Auth failed - try again.';
+            const hasIds = `(client_id: ${data.debug_has_client_id}, secret: ${data.debug_has_client_secret})`;
             const box = document.querySelector('.login-box p');
-            if (box) box.textContent = errMsg;
+            if (box) box.textContent = `${errMsg} ${hasIds}`;
           }
         } catch (e) {
           show('login-screen');
