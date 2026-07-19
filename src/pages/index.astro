@@ -317,53 +317,53 @@ const procurementHasOpen = procurementTasks.some(t => t.status === 'open');
               )}
               {procurementTasks.map(t => (
                 <div class="task-row flex flex-col gap-2.5 px-5 py-3 border-t border-[#F0E8DF]">
-                  <div class="flex items-start justify-between gap-4">
-                    <p class="text-sm text-[#2C2C2C] min-w-0">{t.task}</p>
-                    <div class="flex flex-col items-end gap-1.5 shrink-0">
-                    <div class="flex items-center gap-2">
-                      {t.eggs > 24 ? (
-                        <div class="relative">
-                          <span class="egg-warn-trigger flex items-center gap-1.5 text-xs font-semibold text-[#3B5E3A] bg-[#3B5E3A]/10 px-2 py-1 rounded-full cursor-pointer select-none">
-                            {t.eggs} eggs
-                            <span class="w-4 h-4 rounded-full bg-[#D4A017] text-[#1a1a1a] text-[9px] font-bold flex items-center justify-center leading-none shrink-0">!</span>
-                          </span>
-                          <div class="egg-warn-tooltip hidden absolute right-0 top-8 z-50 w-60 bg-[#2C2C2C] text-white rounded-xl px-3.5 py-3 shadow-xl text-left">
-                            <p class="text-xs font-semibold text-[#D4A017] mb-1">That's a lot of eggs.</p>
-                            <p class="text-xs text-[#ccc] leading-relaxed">Most people don't need that many at once - but your claim doesn't expire. You can collect in batches or pass it on.</p>
-                          </div>
-                        </div>
-                      ) : (
-                        <span class="text-xs font-semibold text-[#3B5E3A] bg-[#3B5E3A]/10 px-2 py-1 rounded-full">{t.eggs} eggs</span>
-                      )}
-                      {t.status === 'open' && (
-                        <button class="task-claim-btn text-xs font-semibold text-[#D4A017] border border-[#D4A017] rounded-full px-3 py-1 hover:bg-[#D4A017] hover:text-white transition" data-task={t.task} data-eggs={String(t.eggs)}>Claim</button>
-                      )}
-                      {t.status === 'pending' && (
-                        <span class="text-xs font-semibold text-[#D4A017] bg-[#D4A017]/10 px-3 py-1 rounded-full">Pending</span>
-                      )}
-                      {t.status === 'claimed' && (
-                        <span class="text-xs font-semibold text-[#7A6652] bg-[#7A6652]/10 px-3 py-1 rounded-full">Claimed</span>
-                      )}
-                    </div>
-                    {t.eggs > 24 && (
-                      <div class="relative w-full">
-                        <button class="egg-info-btn w-full text-[10px] font-semibold text-[#D4A017] border border-[#D4A017]/40 bg-[#D4A017]/5 rounded-full px-3 py-1 hover:bg-[#D4A017]/15 transition">What is $EGG?</button>
-                        <div class="egg-tooltip hidden absolute right-0 top-7 z-50 w-60 bg-[#2C2C2C] text-white rounded-xl px-3.5 py-3 shadow-xl text-left">
-                          <p class="text-xs font-semibold text-[#D4A017] mb-1">What is $EGG?</p>
-                          <p class="text-xs text-[#ccc] leading-relaxed"><span class="text-white font-medium">$EGG</span> is a redeemable claim tracked on a ledger neither of us controls. Collect when you're ready, hold as long as you want, or pass it to someone else.</p>
+                  <p class="text-sm text-[#2C2C2C]">{t.task}</p>
+                  <div class="flex gap-3 items-start">
+                    {t.url && (
+                      <div class="link-preview-slot flex-1 min-w-0" data-url={t.url}>
+                        <div class="link-preview-loading flex items-center gap-2 text-xs text-[#7A6652]">
+                          <span class="w-4 h-4 rounded bg-[#E8DDD0] animate-pulse inline-block"></span>
+                          <span class="animate-pulse">Loading preview...</span>
                         </div>
                       </div>
                     )}
+                    <div class="flex flex-col items-end gap-1.5 shrink-0">
+                      <div class="flex items-center gap-2">
+                        {t.eggs > 24 ? (
+                          <div class="relative">
+                            <span class="egg-warn-trigger flex items-center gap-1.5 text-xs font-semibold text-[#3B5E3A] bg-[#3B5E3A]/10 px-2 py-1 rounded-full cursor-pointer select-none">
+                              {t.eggs} eggs
+                              <span class="w-4 h-4 rounded-full bg-[#D4A017] text-[#1a1a1a] text-[9px] font-bold flex items-center justify-center leading-none shrink-0">!</span>
+                            </span>
+                            <div class="egg-warn-tooltip hidden absolute right-0 top-8 z-50 w-60 bg-[#2C2C2C] text-white rounded-xl px-3.5 py-3 shadow-xl text-left">
+                              <p class="text-xs font-semibold text-[#D4A017] mb-1">That's a lot of eggs.</p>
+                              <p class="text-xs text-[#ccc] leading-relaxed">Most people don't need that many at once - but your claim doesn't expire. You can collect in batches or pass it on.</p>
+                            </div>
+                          </div>
+                        ) : (
+                          <span class="text-xs font-semibold text-[#3B5E3A] bg-[#3B5E3A]/10 px-2 py-1 rounded-full">{t.eggs} eggs</span>
+                        )}
+                        {t.status === 'open' && (
+                          <button class="task-claim-btn text-xs font-semibold text-[#D4A017] border border-[#D4A017] rounded-full px-3 py-1 hover:bg-[#D4A017] hover:text-white transition" data-task={t.task} data-eggs={String(t.eggs)}>Claim</button>
+                        )}
+                        {t.status === 'pending' && (
+                          <span class="text-xs font-semibold text-[#D4A017] bg-[#D4A017]/10 px-3 py-1 rounded-full">Pending</span>
+                        )}
+                        {t.status === 'claimed' && (
+                          <span class="text-xs font-semibold text-[#7A6652] bg-[#7A6652]/10 px-3 py-1 rounded-full">Claimed</span>
+                        )}
+                      </div>
+                      {t.eggs > 24 && (
+                        <div class="relative w-full">
+                          <button class="egg-info-btn w-full text-[10px] font-semibold text-[#D4A017] border border-[#D4A017]/40 bg-[#D4A017]/5 rounded-full px-3 py-1 hover:bg-[#D4A017]/15 transition">What is $EGG?</button>
+                          <div class="egg-tooltip hidden absolute right-0 top-7 z-50 w-60 bg-[#2C2C2C] text-white rounded-xl px-3.5 py-3 shadow-xl text-left">
+                            <p class="text-xs font-semibold text-[#D4A017] mb-1">What is $EGG?</p>
+                            <p class="text-xs text-[#ccc] leading-relaxed"><span class="text-white font-medium">$EGG</span> is a redeemable claim tracked on a ledger neither of us controls. Collect when you're ready, hold as long as you want, or pass it to someone else.</p>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
-                  {t.url && (
-                    <div class="link-preview-slot" data-url={t.url}>
-                      <div class="link-preview-loading flex items-center gap-2 text-xs text-[#7A6652]">
-                        <span class="w-4 h-4 rounded bg-[#E8DDD0] animate-pulse inline-block"></span>
-                        <span class="animate-pulse">Loading preview...</span>
-                      </div>
-                    </div>
-                  )}
                 </div>
               ))}
 
