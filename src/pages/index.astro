@@ -4,11 +4,11 @@ import tasksData from '../data/tasks.json';
 import procurementData from '../data/procurement.json';
 
 const gardenTasks = tasksData.filter(t => t.category === 'garden');
-const gardenInProgress = gardenTasks.filter(t => t.status === 'claimed');
+const gardenInProgress = gardenTasks.filter(t => t.status === 'pending' || t.status === 'claimed');
 const gardenHasOpen = gardenTasks.some(t => t.status === 'open');
 
 const procurementTasks = procurementData;
-const procurementInProgress = procurementTasks.filter(t => t.status === 'claimed');
+const procurementInProgress = procurementTasks.filter(t => t.status === 'pending' || t.status === 'claimed');
 const procurementHasOpen = procurementTasks.some(t => t.status === 'open');
 ---
 
