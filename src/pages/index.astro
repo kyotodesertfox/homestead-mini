@@ -1,17 +1,466 @@
 ---
+import '../styles/global.css';
+import tasksData from '../data/tasks.json';
 
+const gardenTasks = tasksData.filter(t => t.category === 'garden');
+const gardenInProgress = gardenTasks.filter(t => t.status === 'claimed');
+const gardenHasOpen = gardenTasks.some(t => t.status === 'open');
 ---
 
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content="A local exchange where neighbors trade goods and labor without cash." />
+    <title>Homestead - Local Exchange</title>
+  </head>
+  <body class="bg-[#FAF7F2] text-[#2C2C2C] font-sans">
+
+    <!-- Header -->
+    <header class="px-6 pt-6 pb-2 max-w-3xl mx-auto">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold text-[#3B5E3A]">Homestead</h1>
+          <p class="text-[#7A6652] mt-1 text-sm">A local exchange for neighbors</p>
+        </div>
+
+        <!-- Desktop nav pill -->
+        <nav class="hidden sm:flex items-center gap-1 bg-white border border-[#E8DDD0] rounded-full px-3 py-2 shadow-sm text-sm">
+          <a href="#how-it-works" class="px-3 py-1 rounded-full text-[#7A6652] hover:bg-[#3B5E3A] hover:text-white transition font-medium">How it works</a>
+          <a href="#what-we-have" class="px-3 py-1 rounded-full text-[#7A6652] hover:bg-[#3B5E3A] hover:text-white transition font-medium">What we have</a>
+          <a href="#work-available" class="px-3 py-1 rounded-full text-[#7A6652] hover:bg-[#3B5E3A] hover:text-white transition font-medium">Work available</a>
+          <a href="#contact" class="ml-1 px-4 py-1 rounded-full bg-[#3B5E3A] text-white font-semibold hover:opacity-90 transition">Get in touch</a>
+        </nav>
+
+        <!-- Hamburger (mobile only) -->
+        <button
+          id="menu-toggle"
+          class="sm:hidden flex flex-col justify-center items-center w-10 h-10 rounded-full bg-white border border-[#E8DDD0] shadow-sm gap-1.5"
+          aria-label="Open menu"
+          aria-expanded="false"
+        >
+          <span id="bar1" class="block w-5 h-0.5 bg-[#3B5E3A] transition-all duration-200 origin-center"></span>
+          <span id="bar2" class="block w-5 h-0.5 bg-[#3B5E3A] transition-all duration-200"></span>
+          <span id="bar3" class="block w-5 h-0.5 bg-[#3B5E3A] transition-all duration-200 origin-center"></span>
+        </button>
+      </div>
+
+      <!-- Mobile menu drawer -->
+      <nav
+        id="mobile-menu"
+        class="sm:hidden hidden mt-4 bg-white border border-[#E8DDD0] rounded-2xl shadow-md overflow-hidden"
+        aria-label="Mobile navigation"
+      >
+        <a href="#how-it-works" class="mobile-nav-link flex items-center gap-3 px-5 py-4 border-b border-[#F0E8DF] text-[#2C2C2C] font-medium hover:bg-[#FAF7F2] transition">
+          <span class="text-lg">🔧</span> How it works
+        </a>
+        <a href="#what-we-have" class="mobile-nav-link flex items-center gap-3 px-5 py-4 border-b border-[#F0E8DF] text-[#2C2C2C] font-medium hover:bg-[#FAF7F2] transition">
+          <span class="text-lg">🥚</span> What we have
+        </a>
+        <a href="#work-available" class="mobile-nav-link flex items-center gap-3 px-5 py-4 border-b border-[#F0E8DF] text-[#2C2C2C] font-medium hover:bg-[#FAF7F2] transition">
+          <span class="text-lg">🌿</span> Work available
+        </a>
+        <a href="#contact" class="mobile-nav-link flex items-center gap-3 px-5 py-4 text-[#3B5E3A] font-semibold hover:bg-[#FAF7F2] transition">
+          <span class="text-lg">✉️</span> Get in touch
+        </a>
+      </nav>
+    </header>
+
+    <main class="px-6 pt-8 max-w-3xl mx-auto space-y-16 pb-16">
+
+      <!-- Hero + How it works -->
+      <section id="how-it-works" class="space-y-6">
+        <h2 class="text-2xl font-semibold text-[#2C2C2C] leading-snug">
+          Trade what you have.<br />Get what you need.
+        </h2>
+
+        <p class="text-[#7A6652] text-lg leading-relaxed">
+          Bartering is older than money. Neighbors traded what they had for what they needed - labor for food, skills for goods, time for something real - with no intermediary in the middle and no account required. Money solved a "problem of wants" but added a dependency: the bank decides who gets to participate.
+        </p>
+
+        <p class="text-[#7A6652] leading-relaxed">
+          When that access is difficult, barter fills the gap. Two people with something the other needs can make a deal without anyone's permission. We allow everyone to participate and conduct honest commerce.
+        </p>
+
+        <div class="bg-[#D4A017]/10 border-l-4 border-[#D4A017] rounded-r-xl px-5 py-4 space-y-1">
+          <p class="text-[#2C2C2C] font-medium">In a cash deal, one side gains where the other spends.</p>
+          <p class="text-[#2C2C2C] font-semibold text-lg">In a barter, both sides win.</p>
+          <p class="text-sm text-[#7A6652] pt-1">Cash is welcome here as a fallback. Barter is the goal.</p>
+        </div>
+
+        <h3 class="text-xs font-semibold uppercase tracking-widest text-[#D4A017] pt-2">How it works</h3>
+        <ol class="space-y-5 list-none">
+          <li class="flex items-start gap-3">
+            <span class="text-[#3B5E3A] font-bold text-lg">1.</span>
+            <div>
+              <p class="font-semibold">See what's available</p>
+              <p class="text-sm text-[#7A6652] mt-1">Browse what's on offer - eggs, honey, beer, labor, skills. You can see exactly what this homestead has and what it needs.</p>
+            </div>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-[#3B5E3A] font-bold text-lg">2.</span>
+            <div>
+              <p class="font-semibold">Reach out with what you have</p>
+              <p class="text-sm text-[#7A6652] mt-1">Send a message describing what you can offer. It can be labor, a skill, something you grew, something you made - anything with real value to someone else.</p>
+            </div>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-[#3B5E3A] font-bold text-lg">3.</span>
+            <div>
+              <p class="font-semibold">Agree on a trade</p>
+              <p class="text-sm text-[#7A6652] mt-1">We figure out what's fair between us. Two hours of yard work for a dozen eggs. A jar of your jam for a jar of our honey. Whatever makes sense to both sides.</p>
+            </div>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-[#3B5E3A] font-bold text-lg">4.</span>
+            <div>
+              <p class="font-semibold">Exchange in person</p>
+              <p class="text-sm text-[#7A6652] mt-1">Meet up, do the work, hand over the goods. No payment processor. No bank account. Cash is welcome too - but never required.</p>
+            </div>
+          </li>
+        </ol>
+      </section>
+
+      <!-- What we have -->
+      <section id="what-we-have">
+        <h3 class="text-xs font-semibold uppercase tracking-widest text-[#D4A017] mb-6">What we have</h3>
+        <ul class="space-y-4">
+          <li class="flex items-start gap-4 bg-white rounded-xl px-5 py-4 shadow-sm">
+            <span class="text-2xl">🥚</span>
+            <div>
+              <p class="font-semibold">Eggs</p>
+              <p class="text-sm text-[#7A6652]">Fresh from the yard. Available weekly.</p>
+            </div>
+          </li>
+          <li class="flex items-start gap-4 bg-white rounded-xl px-5 py-4 shadow-sm">
+            <span class="text-2xl">🍯</span>
+            <div>
+              <p class="font-semibold">Honey</p>
+              <p class="text-sm text-[#7A6652]">Raw, local, seasonal.</p>
+            </div>
+          </li>
+          <li class="flex items-start gap-4 bg-white rounded-xl px-5 py-4 shadow-sm">
+            <span class="text-2xl">🍺</span>
+            <div>
+              <p class="font-semibold">Beer</p>
+              <p class="text-sm text-[#7A6652]">Small batch, home brewed.</p>
+            </div>
+          </li>
+        </ul>
+      </section>
+
+      <!-- What we need -->
+      <section>
+        <h3 class="text-xs font-semibold uppercase tracking-widest text-[#D4A017] mb-6">What we need</h3>
+        <ul class="space-y-4">
+          <li class="flex items-start gap-4">
+            <span class="text-2xl">🌿</span>
+            <div>
+              <p class="font-semibold">Garden and yard labor</p>
+              <p class="text-sm text-[#7A6652]">Clearing, planting, maintaining.</p>
+            </div>
+          </li>
+          <li class="flex items-start gap-4">
+            <span class="text-2xl">🔧</span>
+            <div>
+              <p class="font-semibold">Skills and repairs</p>
+              <p class="text-sm text-[#7A6652]">Carpentry, mechanical, general handy work.</p>
+            </div>
+          </li>
+          <li class="flex items-start gap-4">
+            <span class="text-2xl">🧺</span>
+            <div>
+              <p class="font-semibold">Goods and produce</p>
+              <p class="text-sm text-[#7A6652]">Have something worth trading? Bring it.</p>
+            </div>
+          </li>
+        </ul>
+      </section>
+
+      <!-- Work available -->
+      <section id="work-available">
+        <h3 class="text-xs font-semibold uppercase tracking-widest text-[#D4A017] mb-2">Work available</h3>
+        <p class="text-sm text-[#7A6652] mb-6">These are tasks that need doing. Payment is in eggs, honey, or beer - no cash required. Claim one below and I will be in touch.</p>
+        <ul class="space-y-4">
+
+          <!-- Garden clearing - accordion -->
+          <li class="bg-white rounded-xl shadow-sm border-l-4 border-[#3B5E3A] overflow-hidden">
+            <button class="task-toggle w-full px-5 py-4 flex items-center justify-between gap-4 text-left">
+              <div>
+                <p class="font-semibold">Garden clearing and prep</p>
+                <p class="text-sm text-[#7A6652] mt-1">Individual tasks - click to see what is open.</p>
+              </div>
+              <div class="flex items-center gap-3 shrink-0">
+                <span class="text-xs font-semibold text-[#3B5E3A] bg-[#3B5E3A]/10 px-3 py-1 rounded-full">Pays in eggs</span>
+                <svg class="task-chevron w-4 h-4 text-[#7A6652] transition-transform duration-200 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </button>
+
+            <div class="task-list hidden">
+              {gardenTasks.map(t => (
+                <div class="task-row flex items-center justify-between gap-4 px-5 py-3 border-t border-[#F0E8DF]">
+                  <p class="text-sm text-[#2C2C2C]">{t.task}</p>
+                  <div class="flex items-center gap-2 shrink-0">
+                    <span class="text-xs font-semibold text-[#3B5E3A] bg-[#3B5E3A]/10 px-2 py-1 rounded-full">{t.eggs} eggs</span>
+                    {t.status === 'open' && (
+                      <button class="task-claim-btn text-xs font-semibold text-[#3B5E3A] border border-[#3B5E3A] rounded-full px-3 py-1 hover:bg-[#3B5E3A] hover:text-white transition" data-task={t.task} data-eggs={String(t.eggs)}>Claim</button>
+                    )}
+                    {t.status === 'pending' && (
+                      <span class="text-xs font-semibold text-[#D4A017] bg-[#D4A017]/10 px-3 py-1 rounded-full">Pending</span>
+                    )}
+                    {t.status === 'claimed' && (
+                      <span class="text-xs font-semibold text-[#7A6652] bg-[#7A6652]/10 px-3 py-1 rounded-full">Claimed</span>
+                    )}
+                  </div>
+                </div>
+              ))}
+
+              {gardenInProgress.length > 0 && (
+                <div class="border-t border-[#F0E8DF] bg-[#FAF7F2] px-5 py-3 space-y-1">
+                  <p class="text-xs font-semibold uppercase tracking-widest text-[#D4A017] mb-2">In progress</p>
+                  {gardenInProgress.map(t => (
+                    <p class="text-sm text-[#2C2C2C]">
+                      <span class="font-medium">{t.anonymous ? 'Anonymous' : t.claimedBy}</span>
+                      <span class="text-[#7A6652]"> - {t.task}</span>
+                    </p>
+                  ))}
+                </div>
+              )}
+
+              {gardenHasOpen && (
+                <div class="task-claim-panel hidden border-t border-[#F0E8DF] bg-[#FAF7F2] px-5 py-4">
+                  <p class="task-claim-label text-sm font-semibold text-[#2C2C2C] mb-3"></p>
+                  <form name="job-claim" netlify netlify-honeypot="bot-field" method="POST">
+                    <input type="hidden" name="form-name" value="job-claim" />
+                    <input type="hidden" name="job" class="task-name-field" value="" />
+                    <p class="hidden"><input name="bot-field" /></p>
+                    <div class="space-y-3">
+                      <input name="name" required placeholder="Your name" class="w-full text-sm border border-[#E8DDD0] rounded-lg px-4 py-2.5 bg-white focus:outline-none focus:border-[#3B5E3A]" />
+                      <input name="contact" required placeholder="Phone or email" class="w-full text-sm border border-[#E8DDD0] rounded-lg px-4 py-2.5 bg-white focus:outline-none focus:border-[#3B5E3A]" />
+                      <textarea name="message" rows="2" placeholder="Anything to add? (optional)" class="w-full text-sm border border-[#E8DDD0] rounded-lg px-4 py-2.5 bg-white focus:outline-none focus:border-[#3B5E3A] resize-none"></textarea>
+                      <label class="flex items-center gap-2 text-sm text-[#7A6652] cursor-pointer">
+                        <input type="checkbox" name="anonymous" value="yes" class="rounded border-[#E8DDD0]" />
+                        Keep my name private
+                      </label>
+                      <div class="flex gap-3">
+                        <button type="submit" class="submit-btn text-sm font-semibold bg-[#3B5E3A] text-white rounded-full px-5 py-2 hover:opacity-90 transition">Send</button>
+                        <button type="button" class="task-cancel-btn text-sm text-[#7A6652] px-3 py-2 hover:text-[#2C2C2C] transition">Cancel</button>
+                      </div>
+                    </div>
+                  </form>
+                  <p class="success-msg hidden text-sm text-[#3B5E3A] font-medium py-2">Got it - I will reach out soon.</p>
+                </div>
+              )}
+            </div>
+          </li>
+
+          <!-- Job 3 - open skill trade -->
+          <li class="job-card bg-white rounded-xl shadow-sm border-l-4 border-[#7A6652] overflow-hidden">
+            <div class="px-5 py-4">
+              <div class="flex items-start justify-between gap-4">
+                <div>
+                  <p class="font-semibold">Have a skill to offer?</p>
+                  <p class="text-sm text-[#7A6652] mt-1">Carpentry, mechanical, electrical, or something else useful. Reach out and we will figure out a trade.</p>
+                </div>
+                <span class="text-xs font-semibold text-[#7A6652] bg-[#7A6652]/10 px-3 py-1 rounded-full whitespace-nowrap">Open trade</span>
+              </div>
+              <button class="claim-btn mt-4 text-sm font-semibold text-[#7A6652] border border-[#7A6652] rounded-full px-4 py-1.5 hover:bg-[#7A6652] hover:text-white transition">
+                Propose a trade
+              </button>
+            </div>
+            <div class="claim-form hidden border-t border-[#F0E8DF] bg-[#FAF7F2] px-5 py-4">
+              <form name="job-claim" netlify netlify-honeypot="bot-field" method="POST">
+                <input type="hidden" name="form-name" value="job-claim" />
+                <input type="hidden" name="job" value="Open skill trade" />
+                <p class="hidden"><input name="bot-field" /></p>
+                <div class="space-y-3">
+                  <input name="name" required placeholder="Your name" class="w-full text-sm border border-[#E8DDD0] rounded-lg px-4 py-2.5 bg-white focus:outline-none focus:border-[#7A6652]" />
+                  <input name="contact" required placeholder="Phone or email" class="w-full text-sm border border-[#E8DDD0] rounded-lg px-4 py-2.5 bg-white focus:outline-none focus:border-[#7A6652]" />
+                  <textarea name="message" required rows="2" placeholder="What can you offer?" class="w-full text-sm border border-[#E8DDD0] rounded-lg px-4 py-2.5 bg-white focus:outline-none focus:border-[#7A6652] resize-none"></textarea>
+                  <div class="flex gap-3">
+                    <button type="submit" class="submit-btn text-sm font-semibold bg-[#7A6652] text-white rounded-full px-5 py-2 hover:opacity-90 transition">Send</button>
+                    <button type="button" class="cancel-btn text-sm text-[#7A6652] px-3 py-2 hover:text-[#2C2C2C] transition">Cancel</button>
+                  </div>
+                </div>
+              </form>
+              <p class="success-msg hidden text-sm text-[#3B5E3A] font-medium py-2">Got it - I will reach out soon.</p>
+            </div>
+          </li>
+
+        </ul>
+      </section>
+
+      <!-- CTA -->
+      <section id="contact" class="bg-[#3B5E3A] text-white rounded-2xl px-6 py-8 text-center">
+        <h3 class="text-xl font-semibold mb-2">Ready to trade?</h3>
+        <p class="text-sm text-green-200 mb-6">Come by or reach out. No account needed to start a conversation.</p>
+        <a
+          href="mailto:zenko18@gmail.com"
+          class="inline-block bg-[#D4A017] text-[#2C2C2C] font-semibold px-6 py-3 rounded-xl text-sm hover:opacity-90 transition"
+        >
+          Get in touch
+        </a>
+      </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="px-6 py-10 max-w-3xl mx-auto text-center text-xs text-[#7A6652]">
+      Homestead - local exchange, real goods, real people.
+    </footer>
+
+    <script>
+      // --- Mobile nav toggle ---
+      const toggle = document.getElementById('menu-toggle');
+      const menu = document.getElementById('mobile-menu');
+      const bar1 = document.getElementById('bar1');
+      const bar2 = document.getElementById('bar2');
+      const bar3 = document.getElementById('bar3');
+
+      let navOpen = false;
+
+      function closeNav() {
+        navOpen = false;
+        menu?.classList.add('hidden');
+        toggle?.setAttribute('aria-expanded', 'false');
+        bar1?.classList.remove('rotate-45', 'translate-y-2');
+        bar2?.classList.remove('opacity-0');
+        bar3?.classList.remove('-rotate-45', '-translate-y-2');
+      }
+
+      toggle?.addEventListener('click', () => {
+        navOpen = !navOpen;
+        menu?.classList.toggle('hidden', !navOpen);
+        toggle.setAttribute('aria-expanded', String(navOpen));
+        if (navOpen) {
+          bar1?.classList.add('rotate-45', 'translate-y-2');
+          bar2?.classList.add('opacity-0');
+          bar3?.classList.add('-rotate-45', '-translate-y-2');
+        } else {
+          closeNav();
+        }
+      });
+
+      document.querySelectorAll('.mobile-nav-link').forEach(link => {
+        link.addEventListener('click', closeNav);
+      });
+
+      // --- Simple job claim forms (open skill trade) ---
+      document.querySelectorAll('.job-card').forEach(card => {
+        const claimBtn = card.querySelector('.claim-btn');
+        const formPanel = card.querySelector('.claim-form');
+        const cancelBtn = card.querySelector('.cancel-btn');
+        const form = card.querySelector('form');
+        const successMsg = card.querySelector('.success-msg');
+
+        claimBtn?.addEventListener('click', () => {
+          formPanel?.classList.remove('hidden');
+          claimBtn.classList.add('hidden');
+          formPanel?.querySelector('input[name="name"]')?.focus();
+        });
+
+        cancelBtn?.addEventListener('click', () => {
+          formPanel?.classList.add('hidden');
+          claimBtn?.classList.remove('hidden');
+          form?.reset();
+        });
+
+        form?.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const submitBtn = form.querySelector('.submit-btn');
+          if (submitBtn) submitBtn.textContent = 'Sending...';
+          try {
+            await fetch('/', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+              body: new URLSearchParams(new FormData(form)).toString(),
+            });
+            form.classList.add('hidden');
+            successMsg?.classList.remove('hidden');
+          } catch {
+            if (submitBtn) submitBtn.textContent = 'Send';
+            alert('Something went wrong - please try again or email directly.');
+          }
+        });
+      });
+
+      // --- Accordion task cards ---
+      document.querySelectorAll('.task-toggle').forEach(toggleBtn => {
+        const card = toggleBtn.closest('li');
+        const taskList = card?.querySelector('.task-list');
+        const chevron = toggleBtn.querySelector('.task-chevron');
+
+        toggleBtn.addEventListener('click', () => {
+          const isOpen = !taskList?.classList.contains('hidden');
+          taskList?.classList.toggle('hidden', isOpen);
+          chevron?.classList.toggle('rotate-180', !isOpen);
+        });
+      });
+
+      document.querySelectorAll('.task-claim-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const card = btn.closest('li');
+          const panel = card?.querySelector('.task-claim-panel');
+          const label = card?.querySelector('.task-claim-label');
+          const nameField = card?.querySelector('.task-name-field');
+          const form = card?.querySelector('form');
+          const successMsg = card?.querySelector('.success-msg');
+
+          const task = btn.dataset.task ?? '';
+          const eggs = btn.dataset.eggs ?? '';
+
+          if (label) label.textContent = `Claiming: ${task} (${eggs} eggs)`;
+          if (nameField) (nameField as HTMLInputElement).value = `${task} (${eggs} eggs)`;
+
+          panel?.classList.remove('hidden');
+          successMsg?.classList.add('hidden');
+          form?.classList.remove('hidden');
+          form?.reset();
+          if (nameField) (nameField as HTMLInputElement).value = `${task} (${eggs} eggs)`;
+          panel?.querySelector('input[name="name"]')?.focus();
+        });
+      });
+
+      document.querySelectorAll('.task-cancel-btn').forEach(btn => {
+        const card = btn.closest('li');
+        const panel = card?.querySelector('.task-claim-panel');
+        const form = card?.querySelector('form');
+
+        btn.addEventListener('click', () => {
+          panel?.classList.add('hidden');
+          form?.reset();
+        });
+      });
+
+      document.querySelectorAll('.task-claim-panel form').forEach(form => {
+        const card = form.closest('li');
+        const panel = card?.querySelector('.task-claim-panel');
+        const successMsg = card?.querySelector('.success-msg');
+
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const submitBtn = form.querySelector('.submit-btn');
+          if (submitBtn) submitBtn.textContent = 'Sending...';
+          try {
+            await fetch('/', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+              body: new URLSearchParams(new FormData(form as HTMLFormElement)).toString(),
+            });
+            form.classList.add('hidden');
+            successMsg?.classList.remove('hidden');
+          } catch {
+            if (submitBtn) submitBtn.textContent = 'Send';
+            alert('Something went wrong - please try again or email directly.');
+          }
+        });
+      });
+    </script>
+
+  </body>
 </html>
