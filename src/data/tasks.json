@@ -4,8 +4,8 @@
     "category": "garden",
     "task": "Mix & pour concrete into frame box",
     "eggs": 12,
-    "status": "pending",
-    "claimedBy": "John",
+    "status": "open",
+    "claimedBy": null,
     "anonymous": false,
     "image": "/concrete.jpg"
   }
