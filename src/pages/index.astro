@@ -1,10 +1,15 @@
 ---
 import '../styles/global.css';
 import tasksData from '../data/tasks.json';
+import procurementData from '../data/procurement.json';
 
 const gardenTasks = tasksData.filter(t => t.category === 'garden');
 const gardenInProgress = gardenTasks.filter(t => t.status === 'claimed');
 const gardenHasOpen = gardenTasks.some(t => t.status === 'open');
+
+const procurementTasks = procurementData;
+const procurementInProgress = procurementTasks.filter(t => t.status === 'claimed');
+const procurementHasOpen = procurementTasks.some(t => t.status === 'open');
 ---
 
 <html lang="en">
@@ -32,7 +37,6 @@ const gardenHasOpen = gardenTasks.some(t => t.status === 'open');
           <a href="#how-it-works" class="px-3 py-1 rounded-full text-[#7A6652] hover:bg-[#3B5E3A] hover:text-white transition font-medium">How it works</a>
           <a href="#what-we-have" class="px-3 py-1 rounded-full text-[#7A6652] hover:bg-[#3B5E3A] hover:text-white transition font-medium">What we have</a>
           <a href="#work-available" class="px-3 py-1 rounded-full text-[#7A6652] hover:bg-[#3B5E3A] hover:text-white transition font-medium">Work available</a>
-          <a href="#contact" class="ml-1 px-4 py-1 rounded-full bg-[#3B5E3A] text-white font-semibold hover:opacity-90 transition">Get in touch</a>
         </nav>
 
         <!-- Hamburger (mobile only) -->
@@ -60,11 +64,8 @@ const gardenHasOpen = gardenTasks.some(t => t.status === 'open');
         <a href="#what-we-have" class="mobile-nav-link flex items-center gap-3 px-5 py-4 border-b border-[#F0E8DF] text-[#2C2C2C] font-medium hover:bg-[#FAF7F2] transition">
           <span class="text-lg">🥚</span> What we have
         </a>
-        <a href="#work-available" class="mobile-nav-link flex items-center gap-3 px-5 py-4 border-b border-[#F0E8DF] text-[#2C2C2C] font-medium hover:bg-[#FAF7F2] transition">
+        <a href="#work-available" class="mobile-nav-link flex items-center gap-3 px-5 py-4 text-[#2C2C2C] font-medium hover:bg-[#FAF7F2] transition">
           <span class="text-lg">🌿</span> Work available
-        </a>
-        <a href="#contact" class="mobile-nav-link flex items-center gap-3 px-5 py-4 text-[#3B5E3A] font-semibold hover:bg-[#FAF7F2] transition">
-          <span class="text-lg">✉️</span> Get in touch
         </a>
       </nav>
     </header>
@@ -190,7 +191,7 @@ const gardenHasOpen = gardenTasks.some(t => t.status === 'open');
           <li class="bg-white rounded-xl shadow-sm border-l-4 border-[#3B5E3A] overflow-hidden">
             <button class="task-toggle w-full px-5 py-4 flex items-center justify-between gap-4 text-left">
               <div>
-                <p class="font-semibold">Garden clearing and prep</p>
+                <p class="font-semibold">Homestead Tasks</p>
                 <p class="text-sm text-[#7A6652] mt-1">Individual tasks - click to see what is open.</p>
               </div>
               <div class="flex items-center gap-3 shrink-0">
@@ -212,6 +213,15 @@ const gardenHasOpen = gardenTasks.some(t => t.status === 'open');
                   </div>
                   <div class="flex items-center gap-2 shrink-0">
                     <span class="text-xs font-semibold text-[#3B5E3A] bg-[#3B5E3A]/10 px-2 py-1 rounded-full">{t.eggs} eggs</span>
+                    {t.eggs > 24 && (
+                      <div class="relative">
+                        <button class="egg-info-btn w-4 h-4 rounded-full bg-[#D4A017] text-[#1a1a1a] text-[9px] font-bold flex items-center justify-center leading-none" aria-label="What is $EGG?">?</button>
+                        <div class="egg-tooltip hidden absolute right-0 top-6 z-20 w-60 bg-[#2C2C2C] text-white rounded-xl px-3.5 py-3 shadow-xl text-left">
+                          <p class="text-xs font-semibold text-[#D4A017] mb-1">That's a lot of eggs.</p>
+                          <p class="text-xs text-[#ccc] leading-relaxed">Most people don't need that many at once. <span class="text-white font-medium">$EGG</span> lets you bank the rest - a redeemable claim tracked on a ledger neither of us controls. Collect when you're ready, hold as long as you want, or pass it to someone else.</p>
+                        </div>
+                      </div>
+                    )}
                     {t.status === 'open' && (
                       <button class="task-claim-btn text-xs font-semibold text-[#3B5E3A] border border-[#3B5E3A] rounded-full px-3 py-1 hover:bg-[#3B5E3A] hover:text-white transition" data-task={t.task} data-eggs={String(t.eggs)}>Claim</button>
                     )}
@@ -264,6 +274,98 @@ const gardenHasOpen = gardenTasks.some(t => t.status === 'open');
             </div>
           </li>
 
+          <!-- Procurement accordion -->
+          <li class="bg-white rounded-xl shadow-sm border-l-4 border-[#D4A017] overflow-hidden">
+            <button class="task-toggle w-full px-5 py-4 flex items-center justify-between gap-4 text-left">
+              <div>
+                <p class="font-semibold">Procurement</p>
+                <p class="text-sm text-[#7A6652] mt-1">Items or materials we are looking to source. Click to see what is needed.</p>
+              </div>
+              <div class="flex items-center gap-3 shrink-0">
+                <span class="text-xs font-semibold text-[#D4A017] bg-[#D4A017]/10 px-3 py-1 rounded-full">Pays in eggs</span>
+                <svg class="task-chevron w-4 h-4 text-[#7A6652] transition-transform duration-200 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </button>
+
+            <div class="task-list hidden">
+              {procurementTasks.length === 0 && (
+                <div class="px-5 py-4 border-t border-[#F0E8DF]">
+                  <p class="text-sm text-[#7A6652]">Nothing listed yet - check back soon.</p>
+                </div>
+              )}
+              {procurementTasks.map(t => (
+                <div class="task-row flex items-start justify-between gap-4 px-5 py-3 border-t border-[#F0E8DF]">
+                  <div class="flex flex-col gap-2 min-w-0">
+                    <p class="text-sm text-[#2C2C2C]">{t.task}</p>
+                    {t.image && (
+                      <img src={t.image} alt={t.task} class="rounded-lg object-cover max-h-40 w-full" />
+                    )}
+                  </div>
+                  <div class="flex items-center gap-2 shrink-0">
+                    <span class="text-xs font-semibold text-[#3B5E3A] bg-[#3B5E3A]/10 px-2 py-1 rounded-full">{t.eggs} eggs</span>
+                    {t.eggs > 24 && (
+                      <div class="relative">
+                        <button class="egg-info-btn w-4 h-4 rounded-full bg-[#D4A017] text-[#1a1a1a] text-[9px] font-bold flex items-center justify-center leading-none" aria-label="What is $EGG?">?</button>
+                        <div class="egg-tooltip hidden absolute right-0 top-6 z-20 w-60 bg-[#2C2C2C] text-white rounded-xl px-3.5 py-3 shadow-xl text-left">
+                          <p class="text-xs font-semibold text-[#D4A017] mb-1">That's a lot of eggs.</p>
+                          <p class="text-xs text-[#ccc] leading-relaxed">Most people don't need that many at once. <span class="text-white font-medium">$EGG</span> lets you bank the rest - a redeemable claim tracked on a ledger neither of us controls. Collect when you're ready, hold as long as you want, or pass it to someone else.</p>
+                        </div>
+                      </div>
+                    )}
+                    {t.status === 'open' && (
+                      <button class="task-claim-btn text-xs font-semibold text-[#D4A017] border border-[#D4A017] rounded-full px-3 py-1 hover:bg-[#D4A017] hover:text-white transition" data-task={t.task} data-eggs={String(t.eggs)}>Claim</button>
+                    )}
+                    {t.status === 'pending' && (
+                      <span class="text-xs font-semibold text-[#D4A017] bg-[#D4A017]/10 px-3 py-1 rounded-full">Pending</span>
+                    )}
+                    {t.status === 'claimed' && (
+                      <span class="text-xs font-semibold text-[#7A6652] bg-[#7A6652]/10 px-3 py-1 rounded-full">Claimed</span>
+                    )}
+                  </div>
+                </div>
+              ))}
+
+              {procurementInProgress.length > 0 && (
+                <div class="border-t border-[#F0E8DF] bg-[#FAF7F2] px-5 py-3 space-y-1">
+                  <p class="text-xs font-semibold uppercase tracking-widest text-[#D4A017] mb-2">In progress</p>
+                  {procurementInProgress.map(t => (
+                    <p class="text-sm text-[#2C2C2C]">
+                      <span class="font-medium">{t.anonymous ? 'Anonymous' : t.claimedBy}</span>
+                      <span class="text-[#7A6652]"> - {t.task}</span>
+                    </p>
+                  ))}
+                </div>
+              )}
+
+              {procurementHasOpen && (
+                <div class="task-claim-panel hidden border-t border-[#F0E8DF] bg-[#FAF7F2] px-5 py-4">
+                  <p class="task-claim-label text-sm font-semibold text-[#2C2C2C] mb-3"></p>
+                  <form name="procurement" netlify netlify-honeypot="bot-field" method="POST">
+                    <input type="hidden" name="form-name" value="procurement" />
+                    <input type="hidden" name="job" class="task-name-field" value="" />
+                    <p class="hidden"><input name="bot-field" /></p>
+                    <div class="space-y-3">
+                      <input name="name" required placeholder="Your name" class="w-full text-sm border border-[#E8DDD0] rounded-lg px-4 py-2.5 bg-white focus:outline-none focus:border-[#D4A017]" />
+                      <input name="contact" required placeholder="Phone or email" class="w-full text-sm border border-[#E8DDD0] rounded-lg px-4 py-2.5 bg-white focus:outline-none focus:border-[#D4A017]" />
+                      <textarea name="message" rows="2" placeholder="Anything to add? (optional)" class="w-full text-sm border border-[#E8DDD0] rounded-lg px-4 py-2.5 bg-white focus:outline-none focus:border-[#D4A017] resize-none"></textarea>
+                      <label class="flex items-center gap-2 text-sm text-[#7A6652] cursor-pointer">
+                        <input type="checkbox" name="anonymous" value="yes" class="rounded border-[#E8DDD0]" />
+                        Keep my name private
+                      </label>
+                      <div class="flex gap-3">
+                        <button type="submit" class="submit-btn text-sm font-semibold bg-[#D4A017] text-[#2C2C2C] rounded-full px-5 py-2 hover:opacity-90 transition">Send</button>
+                        <button type="button" class="task-cancel-btn text-sm text-[#7A6652] px-3 py-2 hover:text-[#2C2C2C] transition">Cancel</button>
+                      </div>
+                    </div>
+                  </form>
+                  <p class="success-msg hidden text-sm text-[#3B5E3A] font-medium py-2">Got it - I will reach out soon.</p>
+                </div>
+              )}
+            </div>
+          </li>
+
           <!-- Job 3 - open skill trade -->
           <li class="job-card bg-white rounded-xl shadow-sm border-l-4 border-[#7A6652] overflow-hidden">
             <div class="px-5 py-4">
@@ -279,9 +381,8 @@ const gardenHasOpen = gardenTasks.some(t => t.status === 'open');
               </button>
             </div>
             <div class="claim-form hidden border-t border-[#F0E8DF] bg-[#FAF7F2] px-5 py-4">
-              <form name="job-claim" netlify netlify-honeypot="bot-field" method="POST">
-                <input type="hidden" name="form-name" value="job-claim" />
-                <input type="hidden" name="job" value="Open skill trade" />
+              <form name="skill-offer" netlify netlify-honeypot="bot-field" method="POST">
+                <input type="hidden" name="form-name" value="skill-offer" />
                 <p class="hidden"><input name="bot-field" /></p>
                 <div class="space-y-3">
                   <input name="name" required placeholder="Your name" class="w-full text-sm border border-[#E8DDD0] rounded-lg px-4 py-2.5 bg-white focus:outline-none focus:border-[#7A6652]" />
@@ -300,18 +401,6 @@ const gardenHasOpen = gardenTasks.some(t => t.status === 'open');
         </ul>
       </section>
 
-      <!-- CTA -->
-      <section id="contact" class="bg-[#3B5E3A] text-white rounded-2xl px-6 py-8 text-center">
-        <h3 class="text-xl font-semibold mb-2">Ready to trade?</h3>
-        <p class="text-sm text-green-200 mb-6">Come by or reach out. No account needed to start a conversation.</p>
-        <a
-          href="mailto:zenko18@gmail.com"
-          class="inline-block bg-[#D4A017] text-[#2C2C2C] font-semibold px-6 py-3 rounded-xl text-sm hover:opacity-90 transition"
-        >
-          Get in touch
-        </a>
-      </section>
-
     </main>
 
     <!-- Footer -->
@@ -320,6 +409,20 @@ const gardenHasOpen = gardenTasks.some(t => t.status === 'open');
     </footer>
 
     <script>
+      // --- $EGG tooltip ---
+      document.querySelectorAll('.egg-info-btn').forEach(btn => {
+        const tooltip = btn.nextElementSibling;
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const isOpen = !tooltip?.classList.contains('hidden');
+          document.querySelectorAll('.egg-tooltip').forEach(t => t.classList.add('hidden'));
+          if (!isOpen) tooltip?.classList.remove('hidden');
+        });
+      });
+      document.addEventListener('click', () => {
+        document.querySelectorAll('.egg-tooltip').forEach(t => t.classList.add('hidden'));
+      });
+
       // --- Mobile nav toggle ---
       const toggle = document.getElementById('menu-toggle');
       const menu = document.getElementById('mobile-menu');

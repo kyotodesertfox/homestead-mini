@@ -1,5 +1,5 @@
 ---
-// Admin panel - client side only, no server rendering needed
+const githubClientId = import.meta.env.GITHUB_CLIENT_ID ?? '';
 ---
 
 <html lang="en">
@@ -32,19 +32,7 @@
         border-radius: 12px;
         padding: 2rem;
       }
-      .login-box p { font-size: 0.85rem; color: #aaa; margin-bottom: 1.25rem; line-height: 1.6; }
-      .login-box input {
-        width: 100%;
-        background: #1a1a1a;
-        border: 1px solid #444;
-        border-radius: 8px;
-        padding: 0.6rem 0.85rem;
-        color: #e5e5e5;
-        font-size: 0.9rem;
-        margin-bottom: 0.75rem;
-        font-family: monospace;
-      }
-      .login-box input:focus { outline: none; border-color: #D4A017; }
+      .login-box p { font-size: 0.85rem; color: #aaa; margin-bottom: 1.5rem; line-height: 1.6; }
 
       /* Buttons */
       .btn {
@@ -56,12 +44,21 @@
         cursor: pointer;
         border: none;
         transition: opacity 0.15s;
+        text-decoration: none;
       }
       .btn:hover { opacity: 0.85; }
       .btn-gold { background: #D4A017; color: #1a1a1a; }
       .btn-green { background: #3B5E3A; color: #fff; }
       .btn-outline { background: transparent; border: 1px solid #555; color: #aaa; }
       .btn-danger { background: transparent; border: 1px solid #7f3131; color: #e57373; font-size: 0.75rem; padding: 0.3rem 0.75rem; }
+      .btn-github {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: #f0f6fc;
+        color: #1a1a1a;
+        border: 1px solid #444;
+      }
 
       /* Toolbar */
       .toolbar {
@@ -127,10 +124,6 @@
       input:focus, select:focus, textarea:focus { outline: none; border-color: #D4A017; }
       select { cursor: pointer; }
 
-      .status-open { color: #6fcf6f; }
-      .status-pending { color: #D4A017; }
-      .status-claimed { color: #aaa; }
-
       .check-label {
         display: flex;
         align-items: center;
@@ -144,11 +137,11 @@
       .add-task-row { text-align: center; padding: 0.5rem 0; }
     </style>
   </head>
-  <body>
+  <body data-client-id={githubClientId}>
 
     <!-- Loading -->
     <div id="loading" class="hidden">
-      <p style="color:#888;font-size:0.9rem;">Loading tasks...</p>
+      <p style="color:#888;font-size:0.9rem;">Loading...</p>
     </div>
 
     <!-- Login -->
@@ -156,9 +149,13 @@
       <h1>Homestead Admin</h1>
       <p class="subtitle">Task management</p>
       <div class="login-box">
-        <p>Enter a GitHub personal access token with <strong>Contents: Read &amp; Write</strong> access to <code>kyotodesertfox/homestead-mini</code>.</p>
-        <input type="password" id="token-input" placeholder="github_pat_..." autocomplete="off" />
-        <button class="btn btn-gold" id="login-btn">Sign in</button>
+        <p>Sign in with GitHub to manage tasks. You will be redirected back here after authorizing.</p>
+        <a id="github-login-btn" class="btn btn-github" href="#">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+          </svg>
+          Sign in with GitHub
+        </a>
       </div>
     </div>
 
@@ -187,6 +184,7 @@
       const REPO = 'kyotodesertfox/homestead-mini';
       const FILE_PATH = 'src/data/tasks.json';
       const API = 'https://api.github.com';
+      const CLIENT_ID = (document.body as HTMLBodyElement).dataset.clientId ?? '';
 
       let token = localStorage.getItem('github_token');
       let currentSha = null;
@@ -206,15 +204,31 @@
         if (!isErr) setTimeout(() => { el.className = ''; el.textContent = ''; }, 4000);
       }
 
-      // --- Auth ---
-      document.getElementById('login-btn')?.addEventListener('click', async () => {
-        const val = (document.getElementById('token-input') as HTMLInputElement).value.trim();
-        if (!val) return;
-        token = val;
-        localStorage.setItem('github_token', token);
-        await init();
-      });
+      // --- GitHub login link ---
+      const loginBtn = document.getElementById('github-login-btn');
+      if (loginBtn && CLIENT_ID) {
+        loginBtn.setAttribute('href', `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&scope=repo&allow_signup=false`);
+      }
 
+      // --- OAuth callback ---
+      async function exchangeCode(code) {
+        show('loading');
+        try {
+          const res = await fetch(`/.netlify/functions/auth?code=${encodeURIComponent(code)}`);
+          const data = await res.json();
+          if (data.token) {
+            token = data.token;
+            localStorage.setItem('github_token', token);
+            await init();
+          } else {
+            show('login-screen');
+          }
+        } catch {
+          show('login-screen');
+        }
+      }
+
+      // --- Auth ---
       document.getElementById('logout-btn')?.addEventListener('click', () => {
         localStorage.removeItem('github_token');
         token = null;
@@ -365,7 +379,7 @@
           tasks = updated;
           setStatus('Saved. Site will update in ~30 seconds.');
         } else {
-          setStatus('Save failed - check your token has write access.', true);
+          setStatus('Save failed - token may have expired.', true);
         }
 
         saveBtn.textContent = 'Save to site';
@@ -388,8 +402,14 @@
         document.querySelector('.task-card:last-child')?.scrollIntoView({ behavior: 'smooth' });
       });
 
-      // --- Init ---
-      if (token) {
+      // --- Entry point ---
+      const params = new URLSearchParams(window.location.search);
+      const oauthCode = params.get('code');
+
+      if (oauthCode) {
+        history.replaceState({}, '', '/admin');
+        exchangeCode(oauthCode);
+      } else if (token) {
         init();
       } else {
         show('login-screen');
