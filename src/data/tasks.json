@@ -1,32 +1,12 @@
 [
   {
-    "id": "clear-brush",
+    "id": "pour-concrete",
     "category": "garden",
-    "task": "Clear overgrown brush along the back fence",
+    "task": "Mix & pour concrete into frame box",
     "eggs": 12,
     "status": "open",
     "claimedBy": null,
     "anonymous": false,
     "image": "/concrete.jpg"
   },
-  {
-    "id": "prep-beds",
-    "category": "garden",
-    "task": "Prep raised beds for fall planting",
-    "eggs": 18,
-    "status": "open",
-    "claimedBy": null,
-    "anonymous": false,
-    "image": null
-  },
-  {
-    "id": "brush-pile",
-    "category": "garden",
-    "task": "Remove dead brush pile near the shed",
-    "eggs": 8,
-    "status": "open",
-    "claimedBy": null,
-    "anonymous": false,
-    "image": null
-  }
 ]
