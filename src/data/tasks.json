@@ -6,7 +6,8 @@
     "eggs": 12,
     "status": "open",
     "claimedBy": null,
-    "anonymous": false
+    "anonymous": false,
+    "image": null
   },
   {
     "id": "prep-beds",
@@ -15,7 +16,8 @@
     "eggs": 18,
     "status": "open",
     "claimedBy": null,
-    "anonymous": false
+    "anonymous": false,
+    "image": null
   },
   {
     "id": "brush-pile",
@@ -24,6 +26,7 @@
     "eggs": 8,
     "status": "open",
     "claimedBy": null,
-    "anonymous": false
+    "anonymous": false,
+    "image": null
   }
 ]
