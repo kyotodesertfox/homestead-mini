@@ -74,6 +74,12 @@ const githubClientId = import.meta.env.GITHUB_CLIENT_ID ?? '';
         padding: 0.6rem 1.4rem;
         font-size: 0.9rem;
       }
+      .btn-publish {
+        background: #3B5E3A;
+        color: #fff;
+        border: none;
+      }
+      .btn-publish:disabled { opacity: 0.45; cursor: default; }
 
       /* Admin header */
       .admin-header {
@@ -99,6 +105,45 @@ const githubClientId = import.meta.env.GITHUB_CLIENT_ID ?? '';
       }
       #status-msg.ok { background: #1a2e1a; color: #6fcf6f; display: inline-block; }
       #status-msg.err { background: #2e1a1a; color: #e57373; display: inline-block; }
+
+      /* Staging banner */
+      #staging-banner {
+        background: #192a19;
+        border-bottom: 1px solid #2a452a;
+        padding: 0.7rem 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+      .staging-text {
+        display: flex;
+        align-items: center;
+        gap: 0.55rem;
+        font-size: 0.8rem;
+        color: #7ab87a;
+      }
+      .staging-dot {
+        width: 7px; height: 7px;
+        background: #6fcf6f;
+        border-radius: 50%;
+        flex-shrink: 0;
+        animation: stagepulse 1.8s ease-in-out infinite;
+      }
+      @keyframes stagepulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+      /* Staged dot on tab label */
+      .tab-staged-dot {
+        display: inline-block;
+        width: 6px; height: 6px;
+        background: #D4A017;
+        border-radius: 50%;
+        margin-left: 5px;
+        vertical-align: middle;
+        position: relative;
+        top: -1px;
+      }
 
       /* Tabs */
       .tab-bar {
@@ -223,6 +268,24 @@ const githubClientId = import.meta.env.GITHUB_CLIENT_ID ?? '';
         padding: 0.75rem 0;
         margin-top: 0.25rem;
       }
+
+      /* Publish modal */
+      #publish-modal {
+        position: fixed; inset: 0; z-index: 100;
+        background: rgba(0,0,0,0.72);
+        display: flex; align-items: center; justify-content: center; padding: 1.5rem;
+      }
+      .modal-box {
+        background: #1e1e1e;
+        border: 1px solid #363636;
+        border-radius: 16px;
+        padding: 2rem;
+        max-width: 360px; width: 100%;
+      }
+      .modal-box h2 { font-size: 1.1rem; font-weight: 700; color: #e5e5e5; margin-bottom: 0.5rem; }
+      .modal-box p { font-size: 0.85rem; color: #888; line-height: 1.6; margin-bottom: 1.75rem; }
+      .modal-btns { display: flex; gap: 0.75rem; }
+      .modal-btns .btn { flex: 1; text-align: center; }
     </style>
   </head>
   <body data-client-id={githubClientId}>
@@ -251,16 +314,25 @@ const githubClientId = import.meta.env.GITHUB_CLIENT_ID ?? '';
       </div>
     </div>
 
+    <!-- Staging banner (outside admin-screen, shown when in draft mode) -->
+    <div id="staging-banner" class="hidden">
+      <div class="staging-text">
+        <span class="staging-dot"></span>
+        <span id="staging-label">Draft mode active - save changes to stage them.</span>
+      </div>
+      <button class="btn btn-publish" id="publish-btn">Publish to site</button>
+    </div>
+
     <!-- Admin -->
     <div id="admin-screen" class="hidden">
       <div class="admin-header">
         <div>
           <h1>Homestead Admin</h1>
-          <p class="subtitle">Changes go live after Netlify redeploys (~30s)</p>
+          <p class="subtitle" id="admin-subtitle">Ready</p>
         </div>
         <div class="header-right">
           <span id="status-msg"></span>
-          <button class="btn btn-green" id="save-btn">Save to site</button>
+          <button class="btn btn-green" id="save-btn">Save draft</button>
           <button class="btn btn-outline" id="logout-btn">Sign out</button>
         </div>
       </div>
@@ -277,6 +349,18 @@ const githubClientId = import.meta.env.GITHUB_CLIENT_ID ?? '';
       </div>
     </div>
 
+    <!-- Publish confirm modal -->
+    <div id="publish-modal" class="hidden">
+      <div class="modal-box">
+        <h2>Publish to site?</h2>
+        <p>All staged changes will go live in about 30 seconds.</p>
+        <div class="modal-btns">
+          <button class="btn btn-outline" id="modal-cancel">Cancel</button>
+          <button class="btn btn-publish" id="modal-confirm">Publish now</button>
+        </div>
+      </div>
+    </div>
+
     <script>
       const REPO = 'kyotodesertfox/homestead-mini';
       const FILES = {
@@ -288,20 +372,23 @@ const githubClientId = import.meta.env.GITHUB_CLIENT_ID ?? '';
 
       let token = localStorage.getItem('github_token');
       let activeTab = 'tasks';
-      const state = {
+      let currentBranch: string | null = null;
+      const stagedTabs = new Set<string>();
+
+      const state: Record<string, { sha: string | null; items: any[]; loaded: boolean }> = {
         tasks:       { sha: null, items: [], loaded: false },
         procurement: { sha: null, items: [], loaded: false },
       };
 
       // --- Screens ---
-      function show(id) {
+      function show(id: string) {
         ['loading', 'login-screen', 'admin-screen'].forEach(s => {
           document.getElementById(s)?.classList.toggle('hidden', s !== id);
         });
       }
 
-      function setStatus(msg, isErr = false) {
-        const el = document.getElementById('status-msg');
+      function setStatus(msg: string, isErr = false) {
+        const el = document.getElementById('status-msg')!;
         el.textContent = msg;
         el.className = isErr ? 'err' : 'ok';
         if (!isErr) setTimeout(() => { el.className = ''; el.textContent = ''; }, 4000);
@@ -314,14 +401,14 @@ const githubClientId = import.meta.env.GITHUB_CLIENT_ID ?? '';
       }
 
       // --- OAuth callback ---
-      async function exchangeCode(code) {
+      async function exchangeCode(code: string) {
         show('loading');
         try {
           const res = await fetch(`/.netlify/functions/auth?code=${encodeURIComponent(code)}`);
           const data = await res.json();
           if (data.token) {
             token = data.token;
-            localStorage.setItem('github_token', token);
+            localStorage.setItem('github_token', token!);
             await init();
           } else {
             show('login-screen');
@@ -330,7 +417,7 @@ const githubClientId = import.meta.env.GITHUB_CLIENT_ID ?? '';
             const box = document.querySelector('.login-box p');
             if (box) box.textContent = `${errMsg} ${hasIds}`;
           }
-        } catch (e) {
+        } catch (e: any) {
           show('login-screen');
           const box = document.querySelector('.login-box p');
           if (box) box.textContent = `Auth error: ${e.message}`;
@@ -340,11 +427,13 @@ const githubClientId = import.meta.env.GITHUB_CLIENT_ID ?? '';
       document.getElementById('logout-btn')?.addEventListener('click', () => {
         localStorage.removeItem('github_token');
         token = null;
+        currentBranch = null;
+        stagedTabs.clear();
         show('login-screen');
       });
 
       // --- GitHub API ---
-      async function ghGet(path) {
+      async function ghGet(path: string) {
         const res = await fetch(`${API}${path}`, {
           headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github.v3+json' }
         });
@@ -352,7 +441,7 @@ const githubClientId = import.meta.env.GITHUB_CLIENT_ID ?? '';
         return res.json();
       }
 
-      async function ghPut(path, body) {
+      async function ghPut(path: string, body: object) {
         return fetch(`${API}${path}`, {
           method: 'PUT',
           headers: {
@@ -364,11 +453,65 @@ const githubClientId = import.meta.env.GITHUB_CLIENT_ID ?? '';
         });
       }
 
+      // --- Branch operations ---
+      async function checkDraftBranch() {
+        const res = await ghGet(`/repos/${REPO}/git/ref/heads/draft`);
+        if (res) {
+          currentBranch = 'draft';
+          return true;
+        }
+        return false;
+      }
+
+      async function ensureDraftBranch() {
+        if (currentBranch === 'draft') return true;
+        const mainRef = await ghGet(`/repos/${REPO}/git/ref/heads/main`);
+        if (!mainRef) return false;
+        await fetch(`${API}/repos/${REPO}/git/refs`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ref: 'refs/heads/draft', sha: mainRef.object.sha }),
+        });
+        // 422 = already exists, fine
+        currentBranch = 'draft';
+        return true;
+      }
+
+      function updateStagingBanner() {
+        const banner = document.getElementById('staging-banner')!;
+        const label = document.getElementById('staging-label')!;
+        const subtitle = document.getElementById('admin-subtitle')!;
+
+        if (currentBranch === 'draft') {
+          banner.classList.remove('hidden');
+          const count = stagedTabs.size;
+          label.textContent = count > 0
+            ? `${count} tab${count > 1 ? 's' : ''} staged - not live yet.`
+            : 'Draft mode active - save changes to stage them.';
+          subtitle.textContent = 'Draft mode';
+        } else {
+          banner.classList.add('hidden');
+          subtitle.textContent = 'Ready';
+        }
+
+        // Tab staged dots
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+          const tab = (btn as HTMLElement).dataset.tab!;
+          const existing = btn.querySelector('.tab-staged-dot');
+          if (stagedTabs.has(tab)) {
+            if (!existing) btn.insertAdjacentHTML('beforeend', '<span class="tab-staged-dot"></span>');
+          } else {
+            existing?.remove();
+          }
+        });
+      }
+
       // --- Load tab ---
-      async function loadTab(tab) {
+      async function loadTab(tab: string) {
         if (state[tab].loaded) { renderItems(); return; }
         show('loading');
-        const data = await ghGet(`/repos/${REPO}/contents/${FILES[tab]}`);
+        const branch = currentBranch || 'main';
+        const data = await ghGet(`/repos/${REPO}/contents/${FILES[tab]}?ref=${branch}`);
         if (!data) {
           localStorage.removeItem('github_token');
           token = null;
@@ -383,15 +526,17 @@ const githubClientId = import.meta.env.GITHUB_CLIENT_ID ?? '';
       }
 
       async function init() {
+        await checkDraftBranch();
         await loadTab(activeTab);
+        updateStagingBanner();
       }
 
       // --- Render ---
-      function esc(s) {
+      function esc(s: any) {
         return String(s ?? '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
       }
 
-      function taskCard(t, i) {
+      function taskCard(t: any, i: number) {
         const opts = ['open','pending','claimed'].map(s =>
           `<option value="${s}" ${t.status === s ? 'selected' : ''}>${s}</option>`
         ).join('');
@@ -435,7 +580,7 @@ const githubClientId = import.meta.env.GITHUB_CLIENT_ID ?? '';
           </div>`;
       }
 
-      function procurementCard(t, i) {
+      function procurementCard(t: any, i: number) {
         const opts = ['open','pending','claimed'].map(s =>
           `<option value="${s}" ${t.status === s ? 'selected' : ''}>${s}</option>`
         ).join('');
@@ -479,7 +624,7 @@ const githubClientId = import.meta.env.GITHUB_CLIENT_ID ?? '';
       }
 
       function renderItems() {
-        const list = document.getElementById('task-list');
+        const list = document.getElementById('task-list')!;
         const items = state[activeTab].items;
         const cardFn = activeTab === 'procurement' ? procurementCard : taskCard;
         if (items.length === 0) {
@@ -490,7 +635,7 @@ const githubClientId = import.meta.env.GITHUB_CLIENT_ID ?? '';
         list.innerHTML = items.map((t, i) => cardFn(t, i)).join('');
         list.querySelectorAll('.delete-btn').forEach(btn => {
           btn.addEventListener('click', () => {
-            state[activeTab].items.splice(parseInt((btn as HTMLElement).dataset.index), 1);
+            state[activeTab].items.splice(parseInt((btn as HTMLElement).dataset.index!), 1);
             renderItems();
           });
         });
@@ -520,7 +665,7 @@ const githubClientId = import.meta.env.GITHUB_CLIENT_ID ?? '';
       // --- Collect ---
       function collectItems() {
         return Array.from(document.querySelectorAll('.task-card')).map(card => {
-          const g = (name) => (card.querySelector(`[name="${name}"]`) as HTMLInputElement);
+          const g = (name: string) => (card.querySelector(`[name="${name}"]`) as HTMLInputElement);
           const claimedBy = g('claimedBy').value.trim();
           if (activeTab === 'procurement') {
             const url = g('url').value.trim();
@@ -551,7 +696,7 @@ const githubClientId = import.meta.env.GITHUB_CLIENT_ID ?? '';
       // --- Tabs ---
       document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', async () => {
-          const tab = (btn as HTMLElement).dataset.tab;
+          const tab = (btn as HTMLElement).dataset.tab!;
           if (tab === activeTab) return;
           activeTab = tab;
           document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b === btn));
@@ -559,32 +704,43 @@ const githubClientId = import.meta.env.GITHUB_CLIENT_ID ?? '';
         });
       });
 
-      // --- Save ---
+      // --- Save draft ---
       document.getElementById('save-btn')?.addEventListener('click', async () => {
         const saveBtn = document.getElementById('save-btn') as HTMLButtonElement;
         saveBtn.textContent = 'Saving...';
         saveBtn.disabled = true;
+
+        const ok = await ensureDraftBranch();
+        if (!ok) {
+          setStatus('Could not create draft branch.', true);
+          saveBtn.textContent = 'Save draft';
+          saveBtn.disabled = false;
+          return;
+        }
 
         const updated = collectItems();
         const newJson = JSON.stringify(updated, null, 2);
         const label = activeTab === 'procurement' ? 'procurement' : 'tasks';
 
         const res = await ghPut(`/repos/${REPO}/contents/${FILES[activeTab]}`, {
-          message: `Update ${label} via admin panel`,
+          message: `Draft: update ${label}`,
           content: btoa(unescape(encodeURIComponent(newJson))),
           sha: state[activeTab].sha,
+          branch: 'draft',
         });
 
         if (res.ok) {
           const data = await res.json();
           state[activeTab].sha = data.content.sha;
           state[activeTab].items = updated;
-          setStatus('Saved. Site will update in ~30 seconds.');
+          stagedTabs.add(activeTab);
+          updateStagingBanner();
+          setStatus('Draft saved.');
         } else {
           setStatus('Save failed - token may have expired.', true);
         }
 
-        saveBtn.textContent = 'Save to site';
+        saveBtn.textContent = 'Save draft';
         saveBtn.disabled = false;
       });
 
@@ -596,6 +752,46 @@ const githubClientId = import.meta.env.GITHUB_CLIENT_ID ?? '';
         state[activeTab].items.push(blank);
         renderItems();
         document.querySelector('.task-card:last-child')?.scrollIntoView({ behavior: 'smooth' });
+      });
+
+      // --- Publish ---
+      document.getElementById('publish-btn')?.addEventListener('click', () => {
+        document.getElementById('publish-modal')!.classList.remove('hidden');
+      });
+
+      document.getElementById('modal-cancel')?.addEventListener('click', () => {
+        document.getElementById('publish-modal')!.classList.add('hidden');
+      });
+
+      document.getElementById('modal-confirm')?.addEventListener('click', async () => {
+        const btn = document.getElementById('modal-confirm') as HTMLButtonElement;
+        btn.textContent = 'Publishing...';
+        btn.disabled = true;
+
+        const res = await fetch(`${API}/repos/${REPO}/merges`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            base: 'main',
+            head: 'draft',
+            commit_message: `Publish: ${new Date().toLocaleString()}`,
+          }),
+        });
+
+        document.getElementById('publish-modal')!.classList.add('hidden');
+        btn.textContent = 'Publish now';
+        btn.disabled = false;
+
+        if (res.ok || res.status === 204) {
+          currentBranch = null;
+          stagedTabs.clear();
+          Object.values(state).forEach(s => { s.loaded = false; s.sha = null; });
+          updateStagingBanner();
+          setStatus('Published. Site will update in ~30 seconds.');
+          await loadTab(activeTab);
+        } else {
+          setStatus('Publish failed - check your connection.', true);
+        }
       });
 
       // --- Entry point ---
