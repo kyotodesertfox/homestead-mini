@@ -15,8 +15,7 @@ const procurementHasOpen = procurementTasks.some(t => t.status === 'open');
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" href="/favicon.ico" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2316a34a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'/><polyline points='9 22 9 12 15 12 15 22'/></svg>" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content="A local exchange where neighbors trade goods and labor without cash." />
@@ -100,9 +99,10 @@ const procurementHasOpen = procurementTasks.some(t => t.status === 'open');
           When that access is difficult, barter fills the gap. Two people with something the other needs can make a deal without anyone's permission. We allow everyone to participate and conduct honest commerce.
         </p>
 
-        <div class="bg-[#D4A017]/10 border-l-4 border-[#D4A017] rounded-r-xl px-5 py-4 space-y-1">
+        <div class="bg-[#D4A017]/10 border-l-4 border-[#D4A017] rounded-r-xl px-5 py-4 space-y-1.5">
           <p class="text-[#2C2C2C] font-medium">In a cash deal, one party always loses.</p>
           <p class="text-[#2C2C2C] font-semibold text-lg">We prefer both parties win.</p>
+          <p class="text-sm text-[#7A6652] pt-1">Barter first. Crypto gladly. Cash accepted - but never preferred.</p>
         </div>
 
         <h3 class="text-xs font-semibold uppercase tracking-widest text-[#D4A017] pt-2">How it works</h3>
@@ -408,15 +408,18 @@ const procurementHasOpen = procurementTasks.some(t => t.status === 'open');
             </button>
             <div class="have-body border-t border-[#16a34a]/20 px-5 py-4 space-y-3">
               <p class="text-sm font-semibold text-[#2C2C2C]">What do I do with all these eggs?</p>
-              <p class="text-xs text-[#16a34a]/70 -mt-1">Spend them here</p>
+              <p class="text-xs text-[#2C2C2C] -mt-1">Trade them here, or swap and gift them between friends for favors</p>
               <p class="text-xs text-[#16a34a] uppercase tracking-widest font-semibold pt-1">Exchange eggs for</p>
               <div class="grid grid-cols-2 gap-3">
-                <div class="flex items-center gap-3 bg-[#f0fdf4] rounded-xl px-4 py-3 border border-[#16a34a]/20">
-                  <span class="text-2xl">🍯</span>
-                  <div>
-                    <p class="font-semibold text-sm">Honey</p>
-                    <p class="text-xs text-[#16a34a]/70">Rate set by market</p>
+                <div class="flex items-center justify-between gap-3 bg-[#f0fdf4] rounded-xl px-4 py-3 border border-[#16a34a]/20">
+                  <div class="flex items-center gap-3">
+                    <span class="text-2xl">🍯</span>
+                    <div>
+                      <p class="font-semibold text-sm">Honey</p>
+                      <p class="text-xs text-[#16a34a]/70">Rate set by market</p>
+                    </div>
                   </div>
+                  <span class="text-xs font-bold text-[#16a34a] shrink-0">25 $EGG</span>
                 </div>
                 <div class="flex items-center gap-3 bg-[#f0fdf4] rounded-xl px-4 py-3 border border-[#16a34a]/20">
                   <span class="text-2xl">🍺</span>
