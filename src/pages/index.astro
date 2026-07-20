@@ -238,7 +238,7 @@ const procurementHasOpen = procurementTasks.some(t => t.status === 'open');
                         <button class="egg-info-btn w-5 h-5 rounded-full bg-[#D4A017] text-[#1a1a1a] text-[11px] font-bold flex items-center justify-center leading-none ring-2 ring-[#D4A017]/30" aria-label="What is $EGG?">!</button>
                         <div class="egg-tooltip hidden absolute right-0 top-7 z-50 w-60 bg-[#2C2C2C] text-white rounded-xl px-3.5 py-3 shadow-xl text-left">
                           <p class="text-xs font-semibold text-[#D4A017] mb-1">That's a lot of eggs.</p>
-                          <p class="text-xs text-[#ccc] leading-relaxed">Most people don't need that many at once. <span class="text-white font-medium">$EGG</span> lets you bank the rest - a redeemable claim tracked on a ledger neither of us controls. Collect when you're ready, hold as long as you want, or pass it to someone else.</p>
+                          <p class="text-xs text-[#ccc] leading-relaxed">We'll send you <span class="text-white font-medium">$EGG</span> tokens to your wallet <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#D4A017" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:-1px;margin:0 1px"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg> - an on-chain claim that is always redeemable for a real physical good.</p>
                         </div>
                       </div>
                     )}
@@ -275,12 +275,18 @@ const procurementHasOpen = procurementTasks.some(t => t.status === 'open');
                     <input type="hidden" name="job" class="task-name-field" value="" />
                     <p class="hidden"><input name="bot-field" /></p>
                     <div class="space-y-3">
-                      <input name="name" required placeholder="Your name" class="w-full text-sm border border-[#E8DDD0] rounded-lg px-4 py-2.5 bg-white focus:outline-none focus:border-[#3B5E3A]" />
-                      <input name="contact" required placeholder="Phone or email" class="w-full text-sm border border-[#E8DDD0] rounded-lg px-4 py-2.5 bg-white focus:outline-none focus:border-[#3B5E3A]" />
-                      <textarea name="message" rows="2" placeholder="Anything to add? (optional)" class="w-full text-sm border border-[#E8DDD0] rounded-lg px-4 py-2.5 bg-white focus:outline-none focus:border-[#3B5E3A] resize-none"></textarea>
+                      <input name="name" required placeholder="Your name" class="w-full text-sm border border-[#E8DDD0] rounded-lg px-4 py-2.5 bg-white focus:outline-none focus:border-2 focus:border-[#3B5E3A]" />
+                      <input name="contact" required placeholder="Phone or email" class="w-full text-sm border border-[#E8DDD0] rounded-lg px-4 py-2.5 bg-white focus:outline-none focus:border-2 focus:border-[#3B5E3A]" />
+                      <textarea name="message" rows="2" placeholder="Anything to add? (optional)" class="w-full text-sm border border-[#E8DDD0] rounded-lg px-4 py-2.5 bg-white focus:outline-none focus:border-2 focus:border-[#3B5E3A] resize-none"></textarea>
                       <label class="flex items-center gap-2 text-sm text-[#7A6652] cursor-pointer">
                         <input type="checkbox" name="anonymous" value="yes" class="rounded border-[#E8DDD0]" />
                         Keep my name private
+                        <span class="relative inline-flex items-center ml-1">
+                          <span class="anon-info-btn w-4 h-4 rounded-full bg-[#E8DDD0] text-[#7A6652] text-[9px] font-bold flex items-center justify-center leading-none cursor-pointer select-none">?</span>
+                          <span class="anon-tooltip hidden absolute left-0 bottom-6 z-50 w-56 bg-[#2C2C2C] text-white rounded-xl px-3 py-2.5 shadow-xl text-left">
+                            <p class="text-[11px] text-[#ccc] leading-relaxed">We like to barter with our neighbors - displaying your name lets others know who is helping in the community. We respect your privacy if you prefer not to.</p>
+                          </span>
+                        </span>
                       </label>
                       <div class="flex gap-3">
                         <button type="submit" class="submit-btn text-sm font-semibold bg-[#3B5E3A] text-white rounded-full px-5 py-2 hover:opacity-90 transition">Send</button>
@@ -337,7 +343,7 @@ const procurementHasOpen = procurementTasks.some(t => t.status === 'open');
                             </span>
                             <div class="egg-warn-tooltip hidden absolute right-0 top-8 z-50 w-60 bg-[#2C2C2C] text-white rounded-xl px-3.5 py-3 shadow-xl text-left">
                               <p class="text-xs font-semibold text-[#D4A017] mb-1">That's a lot of eggs.</p>
-                              <p class="text-xs text-[#ccc] leading-relaxed">Most people don't need that many at once - but your claim doesn't expire. You can collect in batches or pass it on.</p>
+                              <p class="text-xs text-[#ccc] leading-relaxed">We'll send you <span class="text-white font-medium">$EGG</span> tokens to your wallet <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#D4A017" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:-1px;margin:0 1px"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg> - an on-chain claim that is always redeemable for a real physical good.</p>
                             </div>
                           </div>
                         ) : (
@@ -387,12 +393,18 @@ const procurementHasOpen = procurementTasks.some(t => t.status === 'open');
                     <input type="hidden" name="job" class="task-name-field" value="" />
                     <p class="hidden"><input name="bot-field" /></p>
                     <div class="space-y-3">
-                      <input name="name" required placeholder="Your name" class="w-full text-sm border border-[#E8DDD0] rounded-lg px-4 py-2.5 bg-white focus:outline-none focus:border-[#D4A017]" />
-                      <input name="contact" required placeholder="Phone or email" class="w-full text-sm border border-[#E8DDD0] rounded-lg px-4 py-2.5 bg-white focus:outline-none focus:border-[#D4A017]" />
-                      <textarea name="message" rows="2" placeholder="Anything to add? (optional)" class="w-full text-sm border border-[#E8DDD0] rounded-lg px-4 py-2.5 bg-white focus:outline-none focus:border-[#D4A017] resize-none"></textarea>
+                      <input name="name" required placeholder="Your name" class="w-full text-sm border border-[#E8DDD0] rounded-lg px-4 py-2.5 bg-white focus:outline-none focus:border-2 focus:border-[#D4A017]" />
+                      <input name="contact" required placeholder="Phone or email" class="w-full text-sm border border-[#E8DDD0] rounded-lg px-4 py-2.5 bg-white focus:outline-none focus:border-2 focus:border-[#D4A017]" />
+                      <textarea name="message" rows="2" placeholder="Anything to add? (optional)" class="w-full text-sm border border-[#E8DDD0] rounded-lg px-4 py-2.5 bg-white focus:outline-none focus:border-2 focus:border-[#D4A017] resize-none"></textarea>
                       <label class="flex items-center gap-2 text-sm text-[#7A6652] cursor-pointer">
                         <input type="checkbox" name="anonymous" value="yes" class="rounded border-[#E8DDD0]" />
                         Keep my name private
+                        <span class="relative inline-flex items-center ml-1">
+                          <span class="anon-info-btn w-4 h-4 rounded-full bg-[#E8DDD0] text-[#7A6652] text-[9px] font-bold flex items-center justify-center leading-none cursor-pointer select-none">?</span>
+                          <span class="anon-tooltip hidden absolute left-0 bottom-6 z-50 w-56 bg-[#2C2C2C] text-white rounded-xl px-3 py-2.5 shadow-xl text-left">
+                            <p class="text-[11px] text-[#ccc] leading-relaxed">We like to barter with our neighbors - displaying your name lets others know who is helping in the community. We respect your privacy if you prefer not to.</p>
+                          </span>
+                        </span>
                       </label>
                       <div class="flex gap-3">
                         <button type="submit" class="submit-btn text-sm font-semibold bg-[#D4A017] text-[#2C2C2C] rounded-full px-5 py-2 hover:opacity-90 transition">Send</button>
@@ -414,7 +426,7 @@ const procurementHasOpen = procurementTasks.some(t => t.status === 'open');
                 <p class="text-sm text-[#7A6652] mt-1">Trade on the Market</p>
               </div>
               <div class="flex items-center gap-3 shrink-0">
-                <span class="text-xs font-semibold text-[#D4A017] bg-[#D4A017]/10 px-3 py-1 rounded-full">Pays in $EGG</span>
+                <span class="text-xs font-semibold text-[#D4A017] border border-[#D4A017]/40 bg-[#D4A017]/5 rounded-full px-3 py-1">Trade</span>
                 <svg class="have-chevron w-4 h-4 text-[#7A6652] transition-transform duration-200 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                 </svg>
@@ -440,7 +452,10 @@ const procurementHasOpen = procurementTasks.some(t => t.status === 'open');
                   </div>
                 </div>
               </div>
-              <p class="text-xs text-[#7A6652] pt-1">Live rates on <span class="font-semibold text-[#2C2C2C]">Homestead Exchange</span> - coming soon.</p>
+              <div class="flex items-center gap-2 pt-1">
+                <p class="text-xs text-[#7A6652]">Live rates on</p>
+                <a href="https://homesteaders.netlify.app" target="_blank" rel="noopener" class="text-[10px] font-semibold text-[#3B5E3A] border-2 border-[#3B5E3A]/60 bg-[#3B5E3A]/8 rounded-full px-2.5 py-0.5 hover:bg-[#3B5E3A] hover:text-white transition">Homestead Exchange</a>
+              </div>
             </div>
           </li>
 
@@ -463,9 +478,9 @@ const procurementHasOpen = procurementTasks.some(t => t.status === 'open');
                 <input type="hidden" name="form-name" value="skill-offer" />
                 <p class="hidden"><input name="bot-field" /></p>
                 <div class="space-y-3">
-                  <input name="name" required placeholder="Your name" class="w-full text-sm border border-[#E8DDD0] rounded-lg px-4 py-2.5 bg-white focus:outline-none focus:border-[#7A6652]" />
-                  <input name="contact" required placeholder="Phone or email" class="w-full text-sm border border-[#E8DDD0] rounded-lg px-4 py-2.5 bg-white focus:outline-none focus:border-[#7A6652]" />
-                  <textarea name="message" required rows="2" placeholder="What can you offer?" class="w-full text-sm border border-[#E8DDD0] rounded-lg px-4 py-2.5 bg-white focus:outline-none focus:border-[#7A6652] resize-none"></textarea>
+                  <input name="name" required placeholder="Your name" class="w-full text-sm border border-[#E8DDD0] rounded-lg px-4 py-2.5 bg-white focus:outline-none focus:border-2 focus:border-[#7A6652]" />
+                  <input name="contact" required placeholder="Phone or email" class="w-full text-sm border border-[#E8DDD0] rounded-lg px-4 py-2.5 bg-white focus:outline-none focus:border-2 focus:border-[#7A6652]" />
+                  <textarea name="message" required rows="2" placeholder="What can you offer?" class="w-full text-sm border border-[#E8DDD0] rounded-lg px-4 py-2.5 bg-white focus:outline-none focus:border-2 focus:border-[#7A6652] resize-none"></textarea>
                   <div class="flex gap-3">
                     <button type="submit" class="submit-btn text-sm font-semibold bg-[#7A6652] text-white rounded-full px-5 py-2 hover:opacity-90 transition">Send</button>
                     <button type="button" class="cancel-btn text-sm text-[#7A6652] px-3 py-2 hover:text-[#2C2C2C] transition">Cancel</button>
@@ -548,8 +563,9 @@ const procurementHasOpen = procurementTasks.some(t => t.status === 'open');
       }
       wireTooltip('.egg-info-btn', 'egg-tooltip');
       wireTooltip('.egg-warn-trigger', 'egg-warn-tooltip');
+      wireTooltip('.anon-info-btn', 'anon-tooltip');
       document.addEventListener('click', () => {
-        document.querySelectorAll('.egg-tooltip, .egg-warn-tooltip').forEach(t => t.classList.add('hidden'));
+        document.querySelectorAll('.egg-tooltip, .egg-warn-tooltip, .anon-tooltip').forEach(t => t.classList.add('hidden'));
       });
 
       // Desktop hover
@@ -557,6 +573,7 @@ const procurementHasOpen = procurementTasks.some(t => t.status === 'open');
         [
           { trigger: '.egg-warn-trigger', tooltipClass: 'egg-warn-tooltip' },
           { trigger: '.egg-info-btn',     tooltipClass: 'egg-tooltip' },
+          { trigger: '.anon-info-btn',    tooltipClass: 'anon-tooltip' },
         ].forEach(({ trigger, tooltipClass }) => {
           document.querySelectorAll(trigger).forEach(el => {
             const wrapper = el.closest('.relative');
