@@ -27,6 +27,7 @@ const procurementHasOpen = procurementTasks.some(t => t.status === 'open');
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content="https://homestead-mini.netlify.app/og.png" />
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-80DTD35CDL"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -100,9 +101,8 @@ const procurementHasOpen = procurementTasks.some(t => t.status === 'open');
         </p>
 
         <div class="bg-[#D4A017]/10 border-l-4 border-[#D4A017] rounded-r-xl px-5 py-4 space-y-1">
-          <p class="text-[#2C2C2C] font-medium">In a cash deal, one side gains where the other spends.</p>
-          <p class="text-[#2C2C2C] font-semibold text-lg">In a barter, both sides win.</p>
-          <p class="text-sm text-[#7A6652] pt-1">Cash is welcome here as a fallback. Barter is the goal.</p>
+          <p class="text-[#2C2C2C] font-medium">In a cash deal, one party always loses.</p>
+          <p class="text-[#2C2C2C] font-semibold text-lg">We prefer both parties win.</p>
         </div>
 
         <h3 class="text-xs font-semibold uppercase tracking-widest text-[#D4A017] pt-2">How it works</h3>
@@ -167,7 +167,7 @@ const procurementHasOpen = procurementTasks.some(t => t.status === 'open');
                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
               </svg>
             </button>
-            <div class="have-body hidden border-t border-[#F0E8DF] px-5 py-5">
+            <div class="have-body border-t border-[#F0E8DF] px-5 py-5">
               <div class="bg-[#D4A017]/10 border border-[#D4A017]/30 rounded-xl px-5 py-5 text-center mx-auto max-w-xs">
                 <p class="text-[10px] font-semibold uppercase tracking-widest text-[#D4A017] mb-1">Currently on tap</p>
                 <p class="text-[#7A6652] text-[11px] mb-4">Available in Bottles / Draft</p>
@@ -219,48 +219,35 @@ const procurementHasOpen = procurementTasks.some(t => t.status === 'open');
             <button class="task-toggle w-full px-5 py-4 flex items-center justify-between gap-4 text-left">
               <div>
                 <p class="font-semibold">Homestead Tasks</p>
-                <p class="text-sm text-[#7A6652] mt-1">Individual tasks - click to see what is open.</p>
+                <p class="text-sm text-[#3B5E3A]/70 mt-1">Individual tasks - click to see what is open.</p>
               </div>
               <div class="flex items-center gap-3 shrink-0">
                 <span class="text-xs font-semibold text-[#3B5E3A] bg-[#3B5E3A]/10 px-3 py-1 rounded-full">Pays in eggs</span>
-                <svg class="task-chevron w-4 h-4 text-[#7A6652] transition-transform duration-200 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <svg class="task-chevron w-4 h-4 text-[#3B5E3A] transition-transform duration-200 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                 </svg>
               </div>
             </button>
 
-            <div class="task-list hidden">
-              {gardenTasks.map(t => (
-                <div class="task-row flex items-start justify-between gap-4 px-5 py-3 border-t border-[#F0E8DF]">
-                  <div class="flex flex-col gap-2 min-w-0">
-                    <p class="text-sm text-[#2C2C2C]">{t.task}</p>
-                    {t.image && (
-                      <img src={t.image} alt={t.task} class="rounded-lg object-cover max-h-40 w-full" />
-                    )}
-                  </div>
-                  <div class="flex items-center gap-2 shrink-0">
-                    <span class="text-xs font-semibold text-[#3B5E3A] bg-[#3B5E3A]/10 px-2 py-1 rounded-full">{t.eggs} eggs</span>
-                    {t.eggs > 24 && (
-                      <div class="relative">
-                        <button class="egg-info-btn w-5 h-5 rounded-full bg-[#D4A017] text-[#1a1a1a] text-[11px] font-bold flex items-center justify-center leading-none ring-2 ring-[#D4A017]/30" aria-label="What is $EGG?">!</button>
-                        <div class="egg-tooltip hidden absolute right-0 top-7 z-50 w-60 bg-[#2C2C2C] text-white rounded-xl px-3.5 py-3 shadow-xl text-left">
-                          <p class="text-xs font-semibold text-[#D4A017] mb-1">That's a lot of eggs.</p>
-                          <p class="text-xs text-[#ccc] leading-relaxed">We'll send you <span class="text-white font-medium">$EGG</span> tokens to your wallet <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#D4A017" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:-1px;margin:0 1px"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg> - an on-chain claim that is always redeemable for a real physical good.</p>
-                        </div>
-                      </div>
-                    )}
-                    {t.status === 'open' && (
-                      <button class="task-claim-btn text-xs font-semibold text-[#3B5E3A] border border-[#3B5E3A] rounded-full px-3 py-1 hover:bg-[#3B5E3A] hover:text-white transition" data-task={t.task} data-eggs={String(t.eggs)}>Claim</button>
-                    )}
-                    {t.status === 'pending' && (
-                      <span class="text-xs font-semibold text-[#D4A017] bg-[#D4A017]/10 px-3 py-1 rounded-full">Pending</span>
-                    )}
-                    {t.status === 'claimed' && (
-                      <span class="text-xs font-semibold text-[#7A6652] bg-[#7A6652]/10 px-3 py-1 rounded-full">Claimed</span>
-                    )}
-                  </div>
+            <div class="task-list">
+              {gardenTasks.length > 0 && (
+                <div class="flex flex-col gap-2 px-5 py-4 border-t border-[#F0E8DF]">
+                  {gardenTasks.map(t => (
+                    <button
+                      class={`task-pill w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl transition text-left ${t.status === 'open' ? 'group bg-[#f4f8f4] border-2 border-[#3B5E3A]/30 hover:border-[#3B5E3A]/60 hover:bg-[#eaf2ea] active:bg-[#dceadc]' : 'bg-[#f5f5f5] border-2 border-[#E8DDD0] opacity-50 cursor-default'}`}
+                      data-task={t.task}
+                      data-eggs={String(t.eggs)}
+                      data-status={t.status}
+                      data-image={t.image || ''}
+                      data-url=""
+                      data-formname="job-claim"
+                    >
+                      <span class="text-sm text-[#2C2C2C] font-medium leading-snug">{t.task}</span>
+                      <span class={`text-[10px] font-semibold px-2.5 py-1 rounded-full shrink-0 transition ${t.status === 'open' ? 'text-[#3B5E3A] bg-[#3B5E3A]/12 group-active:bg-[#3B5E3A] group-active:text-white' : 'text-[#7A6652] bg-[#7A6652]/10'}`}>{t.eggs} eggs</span>
+                    </button>
+                  ))}
                 </div>
-              ))}
+              )}
 
               {gardenInProgress.length > 0 && (
                 <div class="border-t border-[#F0E8DF] bg-[#FAF7F2] px-5 py-3 space-y-1">
@@ -275,7 +262,7 @@ const procurementHasOpen = procurementTasks.some(t => t.status === 'open');
               )}
 
               {gardenHasOpen && (
-                <div class="task-claim-panel hidden border-t border-[#F0E8DF] bg-[#FAF7F2] px-5 py-4">
+                <div class="task-claim-panel border-t border-[#F0E8DF] bg-[#FAF7F2] px-5 py-4">
                   <p class="task-claim-label text-sm font-semibold text-[#2C2C2C] mb-3"></p>
                   <form name="job-claim" netlify netlify-honeypot="bot-field" method="POST">
                     <input type="hidden" name="form-name" value="job-claim" />
@@ -322,63 +309,43 @@ const procurementHasOpen = procurementTasks.some(t => t.status === 'open');
               </div>
             </button>
 
-            <div class="task-list hidden">
+            <div class="task-list">
               {procurementTasks.length === 0 && (
                 <div class="px-5 py-4 border-t border-[#F0E8DF]">
                   <p class="text-sm text-[#7A6652]">Nothing listed yet - check back soon.</p>
                 </div>
               )}
-              {procurementTasks.map(t => (
-                <div class="task-row flex flex-col gap-2.5 px-5 py-3 border-t border-[#F0E8DF]">
-                  <p class="text-sm text-[#2C2C2C]">{t.task}</p>
-                  <div class="flex gap-3 items-start">
-                    {t.url && (
-                      <div class="link-preview-slot flex-1 min-w-0" data-url={t.url}>
-                        <div class="link-preview-loading flex items-center gap-2 text-xs text-[#7A6652]">
-                          <span class="w-4 h-4 rounded bg-[#E8DDD0] animate-pulse inline-block"></span>
-                          <span class="animate-pulse">Loading preview...</span>
-                        </div>
-                      </div>
-                    )}
-                    <div class="flex flex-col items-end gap-1.5 shrink-0">
-                      <div class="flex items-center gap-2">
-                        {t.eggs > 24 ? (
-                          <div class="relative">
-                            <span class="egg-warn-trigger flex items-center gap-1.5 text-xs font-semibold text-[#3B5E3A] bg-[#3B5E3A]/10 px-2 py-1 rounded-full cursor-pointer select-none">
-                              {t.eggs} eggs
-                              <span class="w-4 h-4 rounded-full bg-[#D4A017] text-[#1a1a1a] text-[9px] font-bold flex items-center justify-center leading-none shrink-0">!</span>
+              {procurementTasks.length > 0 && (
+                <div class="flex flex-col gap-2 px-5 py-4 border-t border-[#F0E8DF]">
+                  {procurementTasks.map(t => (
+                    <button
+                      class={`task-pill w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl transition text-left ${t.status === 'open' ? 'group bg-[#FFFBF2] border-2 border-[#D4A017]/40 hover:border-[#D4A017]/70 hover:bg-[#FFF3D6] active:bg-[#FFE9A0]' : 'bg-[#f5f5f5] border-2 border-[#E8DDD0] opacity-50 cursor-default'}`}
+                      data-task={t.task}
+                      data-eggs={String(t.eggs)}
+                      data-status={t.status}
+                      data-image=""
+                      data-url={t.url || ''}
+                      data-formname="procurement"
+                    >
+                      <span class="text-sm text-[#2C2C2C] font-medium leading-snug">{t.task}</span>
+                      <div class="flex items-center gap-1.5 shrink-0">
+                        <span class={`text-[10px] font-semibold px-2.5 py-1 rounded-full transition ${t.status === 'open' ? 'text-[#D4A017] bg-[#D4A017]/15 group-active:bg-[#D4A017] group-active:text-[#1a1a1a]' : 'text-[#7A6652] bg-[#7A6652]/10'}`}>{t.eggs} eggs</span>
+                        {t.eggs > 24 && (
+                          <span class="relative shrink-0">
+                            <span class="egg-warn-trigger w-4 h-4 rounded-full bg-[#D4A017] text-[#1a1a1a] text-[9px] font-bold flex items-center justify-center leading-none cursor-pointer">!</span>
+                            <span class="egg-warn-tooltip hidden absolute right-0 bottom-6 z-50 w-72 bg-[#2C2C2C] text-white rounded-xl px-3.5 py-3 shadow-xl text-left">
+                              <p class="text-xs font-semibold text-[#D4A017] mb-1.5">That's a lot of eggs.</p>
+                              <p class="text-xs text-[#ccc] leading-relaxed mb-2">We don't always have them all on hand - so we'll send you <span class="text-white font-medium">$EGG</span> <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#D4A017" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:-1px;margin:0 1px"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg> tokens instead. Each one is a neighbor's promise - redeemable for a real egg, or tradeable for something else entirely.</p>
+                              <p class="text-xs text-[#ccc] leading-relaxed mb-2">Gift it, trade it for a favor, bring it to the market. Whoever holds one can always redeem it - the promise doesn't expire.</p>
+                              <p class="text-[10px] text-[#888] leading-relaxed">New to wallets? It takes 2 minutes - <a href="https://metamask.io" target="_blank" rel="noopener" class="text-[#D4A017] underline hover:text-white transition">get one free here.</a></p>
                             </span>
-                            <div class="egg-warn-tooltip hidden absolute right-0 top-8 z-50 w-60 bg-[#2C2C2C] text-white rounded-xl px-3.5 py-3 shadow-xl text-left">
-                              <p class="text-xs font-semibold text-[#D4A017] mb-1">That's a lot of eggs.</p>
-                              <p class="text-xs text-[#ccc] leading-relaxed">We'll send you <span class="text-white font-medium">$EGG</span> tokens to your wallet <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#D4A017" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:-1px;margin:0 1px"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg> - an on-chain claim that is always redeemable for a real physical good.</p>
-                            </div>
-                          </div>
-                        ) : (
-                          <span class="text-xs font-semibold text-[#3B5E3A] bg-[#3B5E3A]/10 px-2 py-1 rounded-full">{t.eggs} eggs</span>
-                        )}
-                        {t.status === 'open' && (
-                          <button class="task-claim-btn text-xs font-semibold text-[#D4A017] border border-[#D4A017] rounded-full px-3 py-1 hover:bg-[#D4A017] hover:text-white transition" data-task={t.task} data-eggs={String(t.eggs)}>Claim</button>
-                        )}
-                        {t.status === 'pending' && (
-                          <span class="text-xs font-semibold text-[#D4A017] bg-[#D4A017]/10 px-3 py-1 rounded-full">Pending</span>
-                        )}
-                        {t.status === 'claimed' && (
-                          <span class="text-xs font-semibold text-[#7A6652] bg-[#7A6652]/10 px-3 py-1 rounded-full">Claimed</span>
+                          </span>
                         )}
                       </div>
-                      {t.eggs > 24 && (
-                        <div class="relative w-full">
-                          <button class="egg-info-btn w-full text-[10px] font-semibold text-[#D4A017] border border-[#D4A017]/40 bg-[#D4A017]/5 rounded-full px-3 py-1 hover:bg-[#D4A017]/15 transition">What is $EGG?</button>
-                          <div class="egg-tooltip hidden absolute right-0 top-7 z-50 w-60 bg-[#2C2C2C] text-white rounded-xl px-3.5 py-3 shadow-xl text-left">
-                            <p class="text-xs font-semibold text-[#D4A017] mb-1">What is $EGG?</p>
-                            <p class="text-xs text-[#ccc] leading-relaxed"><span class="text-white font-medium">$EGG</span> is a digital token you receive in your wallet <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#D4A017" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:-2px;margin:0 2px"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg> - always redeemable 1:1. Collect when you're ready, hold as long as you want, or exchange its value with others.</p>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                    </button>
+                  ))}
                 </div>
-              ))}
+              )}
 
               {procurementInProgress.length > 0 && (
                 <div class="border-t border-[#F0E8DF] bg-[#FAF7F2] px-5 py-3 space-y-1">
@@ -393,7 +360,7 @@ const procurementHasOpen = procurementTasks.some(t => t.status === 'open');
               )}
 
               {procurementHasOpen && (
-                <div class="task-claim-panel hidden border-t border-[#F0E8DF] bg-[#FAF7F2] px-5 py-4">
+                <div class="task-claim-panel border-t border-[#F0E8DF] bg-[#FAF7F2] px-5 py-4">
                   <p class="task-claim-label text-sm font-semibold text-[#2C2C2C] mb-3"></p>
                   <form name="procurement" netlify netlify-honeypot="bot-field" method="POST">
                     <input type="hidden" name="form-name" value="procurement" />
@@ -426,8 +393,8 @@ const procurementHasOpen = procurementTasks.some(t => t.status === 'open');
           </li>
 
           <!-- Trade section -->
-          <li class="bg-white rounded-xl shadow-sm border-l-4 border-[#16a34a]">
-            <button class="have-toggle w-full px-5 py-4 flex items-center justify-between gap-4 text-left">
+          <li class="trade-card-sheen bg-white rounded-xl shadow-sm border-l-4 border-[#16a34a] relative overflow-hidden">
+            <button id="trade-toggle" class="have-toggle w-full px-5 py-4 flex items-center justify-between gap-4 text-left">
               <div>
                 <p class="font-semibold">Trade your Eggs</p>
                 <p class="text-sm text-[#16a34a] mt-1">Trade on the Market</p>
@@ -439,7 +406,7 @@ const procurementHasOpen = procurementTasks.some(t => t.status === 'open');
                 </svg>
               </div>
             </button>
-            <div class="have-body hidden border-t border-[#16a34a]/20 px-5 py-4 space-y-3">
+            <div class="have-body border-t border-[#16a34a]/20 px-5 py-4 space-y-3">
               <p class="text-sm font-semibold text-[#2C2C2C]">What do I do with all these eggs?</p>
               <p class="text-xs text-[#16a34a]/70 -mt-1">Spend them here</p>
               <p class="text-xs text-[#16a34a] uppercase tracking-widest font-semibold pt-1">Exchange eggs for</p>
@@ -480,7 +447,7 @@ const procurementHasOpen = procurementTasks.some(t => t.status === 'open');
                 Propose a trade
               </button>
             </div>
-            <div class="claim-form hidden border-t border-[#F0E8DF] bg-[#FAF7F2] px-5 py-4">
+            <div class="claim-form border-t border-[#F0E8DF] bg-[#FAF7F2] px-5 py-4">
               <form name="skill-offer" netlify netlify-honeypot="bot-field" method="POST">
                 <input type="hidden" name="form-name" value="skill-offer" />
                 <p class="hidden"><input name="bot-field" /></p>
@@ -585,11 +552,17 @@ const procurementHasOpen = procurementTasks.some(t => t.status === 'open');
           document.querySelectorAll(trigger).forEach(el => {
             const wrapper = el.closest('.relative');
             const tooltip = wrapper?.querySelector(`.${tooltipClass}`);
+            let hideTimer;
             wrapper?.addEventListener('mouseenter', () => {
+              clearTimeout(hideTimer);
               document.querySelectorAll('.egg-tooltip, .egg-warn-tooltip').forEach(t => t.classList.add('hidden'));
               tooltip?.classList.remove('hidden');
             });
-            wrapper?.addEventListener('mouseleave', () => tooltip?.classList.add('hidden'));
+            wrapper?.addEventListener('mouseleave', () => {
+              hideTimer = setTimeout(() => tooltip?.classList.add('hidden'), 120);
+            });
+            tooltip?.addEventListener('mouseenter', () => clearTimeout(hideTimer));
+            tooltip?.addEventListener('mouseleave', () => tooltip?.classList.add('hidden'));
           });
         });
       }
@@ -638,13 +611,13 @@ const procurementHasOpen = procurementTasks.some(t => t.status === 'open');
         const successMsg = card.querySelector('.success-msg');
 
         claimBtn?.addEventListener('click', () => {
-          formPanel?.classList.remove('hidden');
+          formPanel?.classList.add('open');
           claimBtn.classList.add('hidden');
           formPanel?.querySelector('input[name="name"]')?.focus();
         });
 
         cancelBtn?.addEventListener('click', () => {
-          formPanel?.classList.add('hidden');
+          formPanel?.classList.remove('open');
           claimBtn?.classList.remove('hidden');
           form?.reset();
         });
@@ -673,9 +646,26 @@ const procurementHasOpen = procurementTasks.some(t => t.status === 'open');
         const body = btn.nextElementSibling;
         const chevron = btn.querySelector('.have-chevron');
         btn.addEventListener('click', () => {
-          const isOpen = !body?.classList.contains('hidden');
-          body?.classList.toggle('hidden', isOpen);
+          const isOpen = body?.classList.contains('open');
+          body?.classList.toggle('open');
           chevron?.classList.toggle('rotate-180', !isOpen);
+
+          if (!isOpen && btn.id === 'trade-toggle') {
+            const rect = btn.getBoundingClientRect();
+            const x = (rect.left + rect.width / 2) / window.innerWidth;
+            const y = (rect.top + rect.height / 2) / window.innerHeight;
+            confetti({
+              particleCount: 60,
+              spread: 70,
+              origin: { x, y },
+              colors: ['#D4A017', '#FFD700', '#16a34a', '#4ade80', '#ffffff'],
+              shapes: ['star', 'circle'],
+              scalar: 0.9,
+              startVelocity: 28,
+              gravity: 0.8,
+              ticks: 180,
+            });
+          }
         });
       });
 
@@ -685,8 +675,8 @@ const procurementHasOpen = procurementTasks.some(t => t.status === 'open');
         const chevron = toggleBtn.querySelector('.task-chevron');
 
         toggleBtn.addEventListener('click', () => {
-          const isOpen = !taskList?.classList.contains('hidden');
-          taskList?.classList.toggle('hidden', isOpen);
+          const isOpen = taskList?.classList.contains('open');
+          taskList?.classList.toggle('open');
           chevron?.classList.toggle('rotate-180', !isOpen);
           if (!isOpen && taskList) loadPreviews(taskList);
         });
@@ -706,7 +696,7 @@ const procurementHasOpen = procurementTasks.some(t => t.status === 'open');
 
           if (label) label.textContent = `Claiming: ${task} (${eggs} eggs)`;
 
-          panel?.classList.remove('hidden');
+          panel?.classList.add('open');
           successMsg?.classList.add('hidden');
           form?.classList.remove('hidden');
 
@@ -729,39 +719,268 @@ const procurementHasOpen = procurementTasks.some(t => t.status === 'open');
         const form = card?.querySelector('form');
 
         btn.addEventListener('click', () => {
-          panel?.classList.add('hidden');
+          panel?.classList.remove('open');
           form?.reset();
         });
       });
 
-      document.querySelectorAll('.task-claim-panel form').forEach(form => {
-        const card = form.closest('li');
-        const panel = card?.querySelector('.task-claim-panel');
-        const successMsg = card?.querySelector('.success-msg');
+      // Task pill modal
+      const taskModal = document.getElementById('task-modal');
 
-        form.addEventListener('submit', async (e) => {
-          e.preventDefault();
-          const submitBtn = form.querySelector('.submit-btn');
-          if (submitBtn) submitBtn.textContent = 'Sending...';
-          try {
-            const formData = new FormData(form as HTMLFormElement);
-            const anonBox = form.querySelector('input[name="anonymous"]') as HTMLInputElement | null;
-            formData.delete('anonymous');
-            formData.append('anonymous', anonBox?.checked ? 'Yes' : 'No');
-            await fetch('/', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-              body: new URLSearchParams(formData).toString(),
+      function openTaskModal(pill: HTMLElement) {
+        const task = pill.dataset.task ?? '';
+        const eggs = pill.dataset.eggs ?? '';
+        const status = pill.dataset.status ?? '';
+        const image = pill.dataset.image ?? '';
+        const url = pill.dataset.url ?? '';
+        const formname = pill.dataset.formname ?? '';
+
+        (document.getElementById('modal-task-name') as HTMLElement).textContent = task;
+        (document.getElementById('modal-job-field') as HTMLInputElement).value = `${task} (${eggs} eggs)`;
+        (document.getElementById('modal-form-name-field') as HTMLInputElement).value = formname;
+
+        const eggsEl = document.getElementById('modal-eggs') as HTMLElement;
+        eggsEl.textContent = `${eggs} eggs`;
+        eggsEl.className = formname === 'procurement'
+          ? 'text-xs font-semibold text-[#D4A017] bg-[#D4A017]/15 px-2.5 py-1 rounded-full'
+          : 'text-xs font-semibold text-[#3B5E3A] bg-[#3B5E3A]/10 px-2.5 py-1 rounded-full';
+
+        const eggWarn = document.getElementById('modal-egg-warn');
+        if (parseInt(eggs) > 24) {
+          eggWarn?.classList.remove('hidden');
+        } else {
+          eggWarn?.classList.add('hidden');
+        }
+
+        const imageWrap = document.getElementById('modal-image-wrap');
+        if (image) {
+          (document.getElementById('modal-image') as HTMLImageElement).src = image;
+          imageWrap?.classList.remove('hidden');
+        } else {
+          imageWrap?.classList.add('hidden');
+        }
+
+        const linkWrap = document.getElementById('modal-link-wrap');
+        if (url) {
+          linkWrap?.classList.remove('hidden');
+          document.getElementById('modal-link-loading')?.classList.remove('hidden');
+          document.getElementById('modal-link-card')?.classList.add('hidden');
+          (document.getElementById('modal-link-img') as HTMLImageElement).src = '';
+          (document.getElementById('modal-link-title') as HTMLElement).textContent = '';
+          (document.getElementById('modal-link-desc') as HTMLElement).textContent = '';
+          (document.getElementById('modal-link-domain') as HTMLElement).textContent = '';
+          fetch(`/.netlify/functions/preview?url=${encodeURIComponent(url)}`)
+            .then(r => r.json())
+            .then(data => {
+              document.getElementById('modal-link-loading')?.classList.add('hidden');
+              const card = document.getElementById('modal-link-card') as HTMLAnchorElement | null;
+              if (!card) return;
+              card.href = url;
+              const imgEl = document.getElementById('modal-link-img') as HTMLImageElement;
+              const banner = document.getElementById('modal-link-banner');
+              if (data.image) {
+                imgEl.src = data.image;
+                imgEl.classList.remove('hidden');
+                banner?.classList.add('hidden');
+              } else {
+                imgEl.classList.add('hidden');
+                banner?.classList.remove('hidden');
+              }
+              (document.getElementById('modal-link-title') as HTMLElement).textContent = data.title || '';
+              (document.getElementById('modal-link-desc') as HTMLElement).textContent = data.description || '';
+              (document.getElementById('modal-link-domain') as HTMLElement).textContent = data.domain || new URL(url).hostname;
+              card.classList.remove('hidden');
+            })
+            .catch(() => {
+              document.getElementById('modal-link-loading')?.classList.add('hidden');
+              const card = document.getElementById('modal-link-card') as HTMLAnchorElement | null;
+              if (!card) return;
+              card.href = url;
+              (document.getElementById('modal-link-img') as HTMLImageElement).classList.add('hidden');
+              document.getElementById('modal-link-banner')?.classList.remove('hidden');
+              (document.getElementById('modal-link-domain') as HTMLElement).textContent = new URL(url).hostname;
+              card.classList.remove('hidden');
             });
-            form.classList.add('hidden');
-            successMsg?.classList.remove('hidden');
-          } catch {
-            if (submitBtn) submitBtn.textContent = 'Send';
-            alert('Something went wrong - please try again or email directly.');
-          }
-        });
+        } else {
+          linkWrap?.classList.add('hidden');
+        }
+
+        const formWrap = document.getElementById('modal-form-wrap');
+        const claimForm = document.getElementById('modal-claim-form') as HTMLFormElement | null;
+        const modalSuccess = document.getElementById('modal-success');
+        if (status === 'open') {
+          formWrap?.classList.remove('hidden');
+          claimForm?.classList.remove('hidden');
+          modalSuccess?.classList.add('hidden');
+          claimForm?.querySelectorAll('input[type="text"], textarea').forEach(el => (el as HTMLInputElement).value = '');
+          claimForm?.querySelectorAll('input[type="checkbox"]').forEach(el => (el as HTMLInputElement).checked = false);
+          const submitBtn = claimForm?.querySelector('.modal-submit-btn');
+          if (submitBtn) submitBtn.textContent = 'Send';
+        } else {
+          formWrap?.classList.add('hidden');
+        }
+
+        taskModal?.classList.remove('hidden');
+        taskModal?.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeTaskModal() {
+        taskModal?.classList.add('hidden');
+        taskModal?.classList.remove('flex');
+        document.body.style.overflow = '';
+      }
+
+      document.querySelectorAll('.task-pill').forEach(pill => {
+        pill.addEventListener('click', () => openTaskModal(pill as HTMLElement));
+      });
+      document.getElementById('modal-close')?.addEventListener('click', closeTaskModal);
+      document.getElementById('modal-cancel')?.addEventListener('click', closeTaskModal);
+      taskModal?.addEventListener('click', (e) => { if (e.target === taskModal) closeTaskModal(); });
+
+      document.getElementById('modal-claim-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const form = e.currentTarget as HTMLFormElement;
+        const submitBtn = form.querySelector('.modal-submit-btn');
+        if (submitBtn) submitBtn.textContent = 'Sending...';
+        try {
+          const formData = new FormData(form);
+          const anonBox = form.querySelector('input[name="anonymous"]') as HTMLInputElement | null;
+          formData.delete('anonymous');
+          formData.append('anonymous', anonBox?.checked ? 'Yes' : 'No');
+          await fetch('/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams(formData).toString(),
+          });
+          form.classList.add('hidden');
+          document.getElementById('modal-success')?.classList.remove('hidden');
+        } catch {
+          if (submitBtn) submitBtn.textContent = 'Send';
+          alert('Something went wrong - please try again or email directly.');
+        }
       });
     </script>
 
+  <!-- Task detail modal -->
+  <div id="task-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden">
+      <div class="flex items-start justify-between px-5 pt-5 pb-3 gap-3">
+        <div class="min-w-0">
+          <p id="modal-task-name" class="font-semibold text-[#2C2C2C] leading-snug"></p>
+          <div class="flex items-center gap-2 mt-2">
+            <span id="modal-eggs" class="text-xs font-semibold px-2.5 py-1 rounded-full"></span>
+            <span id="modal-egg-warn" class="relative hidden">
+              <span class="egg-warn-trigger w-4 h-4 rounded-full bg-[#D4A017] text-[#1a1a1a] text-[9px] font-bold flex items-center justify-center leading-none cursor-pointer">!</span>
+              <span class="egg-warn-tooltip hidden absolute left-0 top-6 z-50 w-72 bg-[#2C2C2C] text-white rounded-xl px-3.5 py-3 shadow-xl">
+                <p class="text-xs font-semibold text-[#D4A017] mb-1.5">That's a lot of eggs.</p>
+                <p class="text-xs text-[#ccc] leading-relaxed mb-2">We don't always have them all on hand - so we'll send you <span class="text-white font-medium">$EGG</span> <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#D4A017" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:-1px;margin:0 1px"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg> tokens instead. Whoever holds one can redeem it - from us, not from whoever gave it to them.</p>
+                <p class="text-xs text-[#ccc] leading-relaxed mb-2">Gift it, trade it for a favor, bring it to the market. Whoever holds one can always redeem it - the promise doesn't expire.</p>
+                <p class="text-[10px] text-[#888] leading-relaxed">New to wallets? It takes 2 minutes - <a href="https://metamask.io" target="_blank" rel="noopener" class="text-[#D4A017] underline hover:text-white transition">get one free here.</a></p>
+              </span>
+            </span>
+          </div>
+        </div>
+        <button id="modal-close" class="shrink-0 w-8 h-8 flex items-center justify-center rounded-full text-[#7A6652] hover:bg-[#F0E8DF] transition">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div id="modal-image-wrap" class="hidden">
+        <img id="modal-image" src="" alt="" class="w-full max-h-52 object-cover" />
+      </div>
+      <div id="modal-link-wrap" class="hidden px-5 pb-3">
+        <div id="modal-link-loading" class="flex items-center gap-2 text-xs text-[#7A6652]">
+          <span class="w-4 h-4 rounded bg-[#E8DDD0] animate-pulse inline-block"></span>
+          <span class="animate-pulse">Loading preview...</span>
+        </div>
+        <a id="modal-link-card" href="#" target="_blank" rel="noopener" class="hidden block border-2 border-[#E8DDD0] rounded-xl overflow-hidden hover:border-[#D4A017] transition bg-white no-underline">
+          <img id="modal-link-img" src="" alt="" class="hidden w-full h-32 object-cover bg-[#F5F0EA]" />
+          <div id="modal-link-banner" class="hidden bg-[#FFFBF2] px-4 py-3 flex items-center gap-3 border-b border-[#E8DDD0]">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D4A017" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            <span class="text-sm font-semibold text-[#D4A017]">Open link</span>
+            <svg class="ml-auto" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D4A017" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </div>
+          <div class="px-3 py-2">
+            <p id="modal-link-title" class="text-xs font-semibold text-[#2C2C2C] line-clamp-1"></p>
+            <p id="modal-link-desc" class="text-[10px] text-[#7A6652] mt-0.5 line-clamp-2"></p>
+            <p id="modal-link-domain" class="text-[11px] font-medium text-[#7A6652] mt-1"></p>
+          </div>
+        </a>
+      </div>
+      <div id="modal-form-wrap" class="hidden px-5 pb-5">
+        <form id="modal-claim-form">
+          <input type="hidden" name="form-name" id="modal-form-name-field" value="" />
+          <input type="hidden" name="job" id="modal-job-field" value="" />
+          <p class="hidden"><input name="bot-field" /></p>
+          <div class="space-y-3">
+            <input name="name" required placeholder="Your name" class="w-full text-sm border border-[#E8DDD0] rounded-lg px-4 py-2.5 bg-white focus:outline-none focus:border-2 focus:border-[#3B5E3A]" />
+            <input name="contact" required placeholder="Phone or email" class="w-full text-sm border border-[#E8DDD0] rounded-lg px-4 py-2.5 bg-white focus:outline-none focus:border-2 focus:border-[#3B5E3A]" />
+            <textarea name="message" rows="2" placeholder="Anything to add? (optional)" class="w-full text-sm border border-[#E8DDD0] rounded-lg px-4 py-2.5 bg-white focus:outline-none focus:border-2 focus:border-[#3B5E3A] resize-none"></textarea>
+            <label class="flex items-center gap-2 text-sm text-[#7A6652] cursor-pointer">
+              <input type="checkbox" name="anonymous" value="yes" class="rounded border-[#E8DDD0]" />
+              Keep my name private
+            </label>
+            <div class="flex gap-3">
+              <button type="submit" class="modal-submit-btn text-sm font-semibold bg-[#3B5E3A] text-white rounded-full px-5 py-2 hover:opacity-90 transition">Send</button>
+              <button type="button" id="modal-cancel" class="text-sm text-[#7A6652] px-3 py-2 hover:text-[#2C2C2C] transition">Cancel</button>
+            </div>
+          </div>
+        </form>
+        <p id="modal-success" class="hidden text-sm text-[#3B5E3A] font-medium py-2">Got it - I will reach out soon.</p>
+      </div>
+    </div>
+  </div>
+
   </body>
 </html>
+
+<style>
+  .trade-card-sheen {
+    background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 50%, #f0fdf4 100%);
+  }
+  .trade-card-sheen::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -75%;
+    width: 45%;
+    height: 200%;
+    background: linear-gradient(
+      to right,
+      transparent 0%,
+      rgba(255, 255, 255, 0.72) 50%,
+      transparent 100%
+    );
+    transform: skewX(-15deg);
+    animation: cardSheen 5s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes cardSheen {
+    0%   { left: -75%; opacity: 0; }
+    10%  { opacity: 1; }
+    40%  { left: 130%; opacity: 1; }
+    41%  { opacity: 0; }
+    100% { left: 130%; opacity: 0; }
+  }
+
+  .have-body,
+  .task-list,
+  .task-claim-panel,
+  .claim-form {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.35s ease, opacity 0.25s ease;
+  }
+  .have-body.open,
+  .task-list.open,
+  .task-claim-panel.open,
+  .claim-form.open {
+    max-height: 800px;
+    opacity: 1;
+  }
+  .task-list.open {
+    overflow: visible;
+    transition: max-height 0.35s ease, opacity 0.25s ease, overflow 0s 0.35s;
+  }
+</style>
