@@ -45,12 +45,19 @@ const procurementHasOpen = procurementTasks.some(t => t.status === 'open');
           <p class="text-[#7A6652] mt-1 text-sm">A local exchange for neighbors</p>
         </div>
 
-        <!-- Desktop nav pill -->
-        <nav class="hidden sm:flex items-center gap-1 bg-white border border-[#E8DDD0] rounded-full px-3 py-2 shadow-sm text-sm">
-          <a href="#how-it-works" class="px-3 py-1 rounded-full text-[#7A6652] hover:bg-[#3B5E3A] hover:text-white transition font-medium">How it works</a>
-          <a href="#what-we-have" class="px-3 py-1 rounded-full text-[#7A6652] hover:bg-[#3B5E3A] hover:text-white transition font-medium">What we have</a>
-          <a href="#work-available" class="px-3 py-1 rounded-full text-[#7A6652] hover:bg-[#3B5E3A] hover:text-white transition font-medium">Work available</a>
-        </nav>
+        <div class="hidden sm:flex flex-col items-end gap-1.5">
+          <!-- Desktop nav pill -->
+          <nav class="flex items-center gap-1 bg-white border border-[#E8DDD0] rounded-full px-3 py-2 shadow-sm text-sm">
+            <a href="#how-it-works" class="px-3 py-1 rounded-full text-[#7A6652] hover:bg-[#3B5E3A] hover:text-white transition font-medium">How it works</a>
+            <a href="#what-we-have" class="px-3 py-1 rounded-full text-[#7A6652] hover:bg-[#3B5E3A] hover:text-white transition font-medium">What we have</a>
+            <a href="#work-available" class="px-3 py-1 rounded-full text-[#7A6652] hover:bg-[#3B5E3A] hover:text-white transition font-medium">Work available</a>
+          </nav>
+
+          <!-- Nudge toward the main Exchange app - flag/pennant shape, not another pill -->
+          <a href="https://homesteaders.netlify.app" target="_blank" rel="noopener" class="text-[11px] font-semibold tracking-wide text-white bg-[#16a34a] pl-3 pr-6 py-1.5 hover:bg-[#3B5E3A] transition [clip-path:polygon(0%_0%,88%_0%,100%_50%,88%_100%,0%_100%)] [filter:drop-shadow(0_1px_2px_rgba(0,0,0,0.15))]">
+            Looking for Homestead Exchange?
+          </a>
+        </div>
 
         <!-- Hamburger (mobile only) -->
         <button
